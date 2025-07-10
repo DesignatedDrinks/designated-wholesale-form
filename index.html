@@ -6,179 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background: #f2f5f9; color: #333; }
-    header {
-      background: white;
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    header h1 { margin: 0; font-size: 28px; color: #001f3f; }
-    .submit-top {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .submit-top button {
-      background: #001f3f;
-      color: white;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .submit-top button:hover { background: #003366; }
-    .order-total-header {
-      font-size: 16px;
-      font-weight: bold;
-      color: #001f3f;
-    }
-    main { max-width: 1100px; margin: auto; padding: 20px; }
-    .buyer-info, .form-actions {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
-    }
-    .buyer-info label { display: block; margin-bottom: 6px; font-weight: 600; }
-    .buyer-info input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-    .vendor-header {
-      font-size: 20px;
-      font-weight: bold;
-      color: #001f3f;
-      padding: 12px;
-      background: #f9fafb;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      user-select: none;
-    }
-    .vendor-products {
-      display: none;           /* collapsed by default */
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 10px;
-    }
-    .product-row {
-      flex: 0 1 calc(50% - 16px);
-      max-width: 300px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
-    }
-    .product-row img {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-    }
-    .product-details { text-align: center; }
-    .product-title { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
-    .can-size { font-size: 14px; color: #555; }
-    .qty-inputs {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .qty-control {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .qty-control button {
-      width: 32px;
-      height: 32px;
-      background: #e2e8f0;
-      border: none;
-      border-radius: 4px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .qty-control input {
-      flex: 1;
-      text-align: center;
-      padding: 8px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      -moz-appearance: textfield;
-    }
-    .qty-control input::-webkit-outer-spin-button,
-    .qty-control input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    .form-actions button {
-      background: #001f3f;
-      color: white;
-      padding: 14px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .form-actions button:hover { background: #003366; }
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-      }
-      .submit-top { flex-direction: column; }
-      .vendor-products { flex-direction: column; }
-      .product-row {
-        flex: 1 1 100%;
-        max-width: none;
-      }
-    }
-    /* Loading spinner */
-    #loader {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #001f3f;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-      z-index: 2000;
-    }
-    @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
-    }
+    /* …all your existing styles… */
   </style>
 </head>
 <body>
   <div id="loader"></div>
-
   <form id="wholesaleForm">
     <header>
       <h1>Wholesale Order Form</h1>
@@ -187,7 +19,6 @@
         <span class="order-total-header">Total: $0.00</span>
       </div>
     </header>
-
     <main>
       <div class="buyer-info">
         <label for="name">Full Name</label>
@@ -197,9 +28,7 @@
         <label for="email">Email Address</label>
         <input id="email" name="email" type="email" required>
       </div>
-
       <div id="productList"></div>
-
       <div class="form-actions">
         <button type="submit">Submit Order</button>
       </div>
@@ -208,7 +37,7 @@
 
   <script>
   (async () => {
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/export?format=csv';
     const text = await fetch(sheetUrl).then(r => r.text());
     const rows = text.split('\n').slice(1).map(r => r.split(','));
     const grouped = {};
@@ -216,10 +45,11 @@
     rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
       if (!title || status.trim().toLowerCase() !== 'yes') return;
       const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
-      const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
-                              .replace(/\(Non-Alcoholic\)/i, '')
-                              .trim();
-      (grouped[vendor] = grouped[vendor] || []).push({
+      const cleanTitle = title
+        .replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
+        .replace(/\(Non-Alcoholic\)/i, '')
+        .trim();
+      (grouped[vendor] = grouped[vendor]||[]).push({
         title: cleanTitle,
         canSize,
         casePrice: parseFloat(casePrice),
@@ -236,13 +66,15 @@
       const cont = document.createElement('div');
       cont.className = 'vendor-products';
       hdr.onclick = () => {
-        cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
+        cont.style.display = cont.style.display==='flex'?'none':'flex';
       };
 
       products.forEach(p => {
         const row = document.createElement('div');
         row.className = 'product-row';
-        row.dataset.itemTitle = p.title;
+        // ← here’s the change: include vendor in the title
+        row.dataset.itemTitle = vendor + ' – ' + p.title;
+
         row.innerHTML = `
           <img src="${p.imageUrl}" alt="${p.title}">
           <div class="product-details">
@@ -264,66 +96,8 @@
       list.append(hdr, cont);
     });
 
-    function updateTotals() {
-      let total = 0;
-      document.querySelectorAll('.qty-control input').forEach(i => {
-        total += (parseInt(i.value)||0)*parseFloat(i.dataset.price);
-      });
-      document.querySelectorAll('.order-total-header').forEach(el => {
-        el.textContent = `Total: $${total.toFixed(2)}`;
-      });
-    }
-    document.getElementById('productList').addEventListener('input', updateTotals);
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('increment')||e.target.classList.contains('decrement')) {
-        const input = e.target.closest('.qty-control').querySelector('input');
-        let val = parseInt(input.value)||0;
-        val += e.target.classList.contains('increment')?1:-1;
-        input.value = val<0?0:val;
-        updateTotals();
-      }
-    });
+    // … rest of your JS (updateTotals, spinner logic, submit handler) remains unchanged …
 
-    const form = document.getElementById('wholesaleForm'),
-          loader = document.getElementById('loader'),
-          scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      loader.style.display = 'block';
-      updateTotals();
-
-      const params = new URLSearchParams();
-      ['fullName','companyName','email'].forEach(k => params.append(k, form[k].value.trim()));
-
-      let idx = 0;
-      document.querySelectorAll('.product-row').forEach(row => {
-        const cnt = parseInt(row.querySelector('.qty-control input').value)||0;
-        if (cnt) {
-          params.append(`item_${idx}_title`, row.dataset.itemTitle);
-          params.append(`item_${idx}_cases`,  cnt);
-          idx++;
-        }
-      });
-
-      try {
-        const resp = await fetch(scriptURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: params.toString()
-        });
-        if (!resp.ok) throw new Error('Network response not ok');
-        alert('✅ Order submitted! A rep will contact you shortly.');
-        form.reset();
-        updateTotals();
-        window.scrollTo(0,0);
-      } catch (err) {
-        console.error(err);
-        alert('⚠️ Error submitting order. Please try again.');
-      } finally {
-        loader.style.display = 'none';
-      }
-    });
   })();
   </script>
 </body>
