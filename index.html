@@ -15,7 +15,7 @@
     }
     header {
       background: white;
-      padding: 20px 30px;
+      padding: 20px 30px 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       text-align: center;
       position: sticky;
@@ -119,17 +119,28 @@
     .form-actions button:hover {
       background: #003366;
     }
+    #totalBox {
+      background: #fff4e5;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-<header>
-  <h1>Wholesale Order Form</h1>
-  <div class="submit-top">
-    <button type="submit" form="wholesaleForm">Submit Order</button>
-  </div>
-</header>
-<main>
-  <form id="wholesaleForm">
+
+<form id="wholesaleForm">
+  <header>
+    <h1>Wholesale Order Form</h1>
+    <div class="submit-top">
+      <button type="submit">Submit Order</button>
+    </div>
+  </header>
+
+  <main>
     <div class="buyer-info">
       <label for="name">Full Name</label>
       <input type="text" id="name" name="name" required>
@@ -145,11 +156,13 @@
       <!-- Products will be loaded here -->
     </div>
 
+    <div id="totalBox">Total Estimate: $0.00</div>
+
     <div class="form-actions">
       <button type="submit">Submit Order</button>
     </div>
-  </form>
-</main>
+  </main>
+</form>
 
 <script>
 async function loadProducts() {
@@ -157,11 +170,10 @@ async function loadProducts() {
   const res = await fetch(sheetUrl);
   const text = await res.text();
   const rows = text.split('\n').slice(1).map(r => r.split(','));
-
   const list = document.getElementById('productList');
 
   rows.forEach(row => {
-    const [title, canSize, , , imageUrl, , status] = row;
+    const [title, canSize, , , imageUrl, price, status] = row;
     if (!title || status.trim().toLowerCase() !== 'yes') return;
 
     const id = title.replace(/\s+/g, '_').toLowerCase();
@@ -175,14 +187,30 @@ async function loadProducts() {
       </div>
       <div class="qty-inputs">
         <label for="${id}_cans">Cans</label>
-        <input type="number" id="${id}_cans" name="${title}__cans" min="0" step="1">
+        <input type="number" id="${id}_cans" name="${title}__cans" min="0" step="1" data-price="${parseFloat(price)}">
         <label for="${id}_cases">Cases</label>
-        <input type="number" id="${id}_cases" name="${title}__cases" min="0" step="1">
+        <input type="number" id="${id}_cases" name="${title}__cases" min="0" step="1" data-price="${parseFloat(price) * 6}">
       </div>
     `;
     list.appendChild(div);
   });
+
+  list.addEventListener('input', updateTotal);
 }
+
+function updateTotal() {
+  const inputs = document.querySelectorAll('#productList input');
+  let total = 0;
+  inputs.forEach(input => {
+    const qty = parseInt(input.value) || 0;
+    const price = parseFloat(input.dataset.price) || 0;
+    total += qty * price;
+  });
+  document.getElementById('totalBox').innerText = `Total Estimate: $${total.toFixed(2)}`;
+}
+
+
+// Send order to Google Sheets + confirmation email
 
 document.getElementById('wholesaleForm').addEventListener('submit', async function(e) {
   e.preventDefault();
@@ -196,8 +224,10 @@ document.getElementById('wholesaleForm').addEventListener('submit', async functi
   });
 
   if (response.ok) {
-    alert('Order submitted! A rep will contact you shortly.');
+    alert('Order submitted! A rep will contact you shortly. A confirmation has been sent to your email.');
     this.reset();
+    document.getElementById('totalBox').innerText = 'Total Estimate: $0.00';
+    window.scrollTo(0, 0);
   } else {
     alert('Error submitting order. Please try again.');
   }
