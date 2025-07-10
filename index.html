@@ -33,44 +33,33 @@
 <form id="wholesaleForm">
   <header>
     <h1>Wholesale Order Form</h1>
-    <div class="submit-top">
-      <button type="submit">Submit Order</button>
-    </div>
+    <div class="submit-top"><button type="submit">Submit Order</button></div>
   </header>
   <main>
     <div class="buyer-info">
-      <label for="name">Full Name</label>
-      <input type="text" id="name" name="name" required>
-
-      <label for="company">Company Name</label>
-      <input type="text" id="company" name="company" required>
-
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" required>
+      <label for="name">Full Name</label><input type="text" id="name" name="name" required>
+      <label for="company">Company Name</label><input type="text" id="company" name="company" required>
+      <label for="email">Email Address</label><input type="email" id="email" name="email" required>
     </div>
     <div id="productList"><!-- Products will load here --></div>
     <div id="totalBox">Total Estimate: $0.00</div>
-    <div class="form-actions">
-      <button type="submit">Submit Order</button>
-    </div>
+    <div class="form-actions"><button type="submit">Submit Order</button></div>
   </main>
 </form>
 <script>
-// Load products from Google Sheet CSV
 async function loadProducts() {
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
   try {
     const res = await fetch(sheetUrl);
     const csv = await res.text();
     if (!csv) throw new Error('Empty CSV');
-    const rows = csv.split('\n').slice(1).map(r => r.split(','));
-    const list = document.getElementById('productList');
-    rows.forEach(([title, canSize, , , imageUrl, price, status]) => {
-      if (!title || status.trim().toLowerCase() !== 'yes') return;
-      const id = title.replace(/\s+/g, '_').toLowerCase();
-      const div = document.createElement('div');
-      div.className = 'product-row';
-      div.innerHTML = `
+    const rows = csv.split('\n').slice(1).map(r=>r.split(','));
+    const list=document.getElementById('productList');
+    rows.forEach(([title,canSize,,,imageUrl,price,status])=>{
+      if(!title||status.trim().toLowerCase()!=='yes')return;
+      const id=title.replace(/\s+/g,'_').toLowerCase();
+      const div=document.createElement('div');div.className='product-row';
+      div.innerHTML=`
         <img src="${imageUrl}" alt="${title}">
         <div class="product-details">
           <div class="product-title">${title}</div>
@@ -81,48 +70,32 @@ async function loadProducts() {
           <input type="number" id="${id}_cans" name="${title}__cans" min="0" step="1" data-price="${parseFloat(price)}">
           <label for="${id}_cases">Cases</label>
           <input type="number" id="${id}_cases" name="${title}__cases" min="0" step="1" data-price="${(parseFloat(price)*24).toFixed(2)}">
-        </div>
-      `;
+        </div>`;
       list.appendChild(div);
     });
-    list.addEventListener('input', updateTotal);
-  } catch (err) {
-    console.error('Product load error:', err);
-    document.getElementById('productList').innerHTML = '<p style="color:red;">Error loading products. Please refresh.</p>';
+    list.addEventListener('input',updateTotal);
+  }catch(err){
+    console.error('Product load error:',err);
+    document.getElementById('productList').innerHTML='<p style="color:red;">Error loading products. Please make the sheet public.</p>';
   }
 }
-// Update total price
-function updateTotal() {
-  let total = 0;
-  document.querySelectorAll('#productList input').forEach(inp => {
-    const qty = parseInt(inp.value)||0;
-    const price = parseFloat(inp.dataset.price)||0;
-    total += qty * price;
+function updateTotal(){
+  let total=0;
+  document.querySelectorAll('#productList input').forEach(inp=>{
+    const qty=parseInt(inp.value)||0,price=parseFloat(inp.dataset.price)||0;
+    total+=qty*price;
   });
-  document.getElementById('totalBox').innerText = `Total Estimate: $${total.toFixed(2)}`;
+  document.getElementById('totalBox').innerText=`Total Estimate: $${total.toFixed(2)}`;
 }
-// Handle form submission
-document.getElementById('wholesaleForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  console.log('Submit clicked');
-  const data = Object.fromEntries(new FormData(this).entries());
-  try {
-    const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-    const text = await resp.text(); console.log('Server response:', text);
-    if (resp.ok) {
-      alert('Order submitted! A rep will contact you shortly.');
-      this.reset(); updateTotal(); window.scrollTo(0,0);
-    } else throw new Error('Network response was not OK');
-  } catch (err) {
-    console.error('Submit error:', err);
-    alert('Error submitting order. Check console.');
-  }
+document.getElementById('wholesaleForm').addEventListener('submit',async function(e){
+  e.preventDefault();console.log('Submit clicked');
+  const data=Object.fromEntries(new FormData(this).entries());
+  try{
+    const resp=await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec',{method:'POST',body:JSON.stringify(data)});
+    const text=await resp.text();console.log('Server response:',text);
+    if(resp.ok){alert('Order submitted! A rep will contact you shortly.');this.reset();updateTotal();window.scrollTo(0,0);}else throw new Error('Network response was not OK');
+  }catch(err){console.error('Submit error:',err);alert('Error submitting order. Check console.');}
 });
-// Initialize
 loadProducts();
 </script>
 </body>
