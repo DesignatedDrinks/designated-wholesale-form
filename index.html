@@ -36,171 +36,188 @@
       .vendor-products, .product-row { flex-direction: column; align-items: flex-start; }
       .qty-inputs { width: 100%; }
     }
+
+    /* Loading spinner styles */
+    #loader {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #001f3f;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      z-index: 2000;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
   </style>
 </head>
 <body>
-<form id="wholesaleForm">
-  <header>
-    <h1>Wholesale Order Form</h1>
-    <div class="submit-top">
-      <button type="submit">Submit Order</button>
-    </div>
-  </header>
-  <main>
-    <div class="buyer-info">
-      <label for="name">Full Name</label>
-      <input id="name" name="fullName" type="text" required>
-      <label for="company">Company Name</label>
-      <input id="company" name="companyName" type="text" required>
-      <label for="email">Email Address</label>
-      <input id="email" name="email" type="email" required>
-    </div>
+  <!-- Loader: shows while the form is submitting -->
+  <div id="loader"></div>
 
-    <div class="filters">
-      <input id="searchBar" placeholder="Search products...">
-      <select id="jumpVendor">
-        <option value="">Jump to vendor...</option>
-      </select>
-    </div>
+  <form id="wholesaleForm">
+    <header>
+      <h1>Wholesale Order Form</h1>
+      <div class="submit-top">
+        <button type="submit">Submit Order</button>
+      </div>
+    </header>
+    <main>
+      <div class="buyer-info">
+        <label for="name">Full Name</label>
+        <input id="name" name="fullName" type="text" required>
+        <label for="company">Company Name</label>
+        <input id="company" name="companyName" type="text" required>
+        <label for="email">Email Address</label>
+        <input id="email" name="email" type="email" required>
+      </div>
 
-    <div id="productList"></div>
+      <div class="filters">
+        <input id="searchBar" placeholder="Search products...">
+        <select id="jumpVendor">
+          <option value="">Jump to vendor...</option>
+        </select>
+      </div>
 
-    <div id="totalBox">Total Estimate: $0.00</div>
+      <div id="productList"></div>
 
-    <div class="form-actions">
-      <button type="submit">Submit Order</button>
-    </div>
-  </main>
-</form>
+      <div id="totalBox">Total Estimate: $0.00</div>
 
-<script>
-(async () => {
-  // 1) Fetch and parse CSV
-  const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
-  const text = await fetch(sheetUrl).then(r => r.text());
-  const rows = text.split('\n').slice(1).map(r => r.split(','));
-  const grouped = {};
+      <div class="form-actions">
+        <button type="submit">Submit Order</button>
+      </div>
+    </main>
+  </form>
 
-  rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
-    if (!title || status.trim().toLowerCase() !== 'yes') return;
-    const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
-    grouped[vendor] = grouped[vendor] || [];
-    const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
-                            .replace(/\(Non-Alcoholic\)/i, '').trim();
-    grouped[vendor].push({
-      title: cleanTitle,
-      canSize,
-      canPrice: parseFloat(canPrice),
-      casePrice: parseFloat(casePrice),
-      imageUrl
-    });
-  });
-
-  // 2) Render products & vendor jump
-  const list = document.getElementById('productList');
-  const jump = document.getElementById('jumpVendor');
-  Object.keys(grouped).sort().forEach(vendor => {
-    jump.append(new Option(vendor, vendor));
-
-    const hdr = document.createElement('div');
-    hdr.className = 'vendor-header';
-    hdr.textContent = vendor + ' ▼';
-
-    const cont = document.createElement('div');
-    cont.className = 'vendor-products';
-
-    hdr.onclick = () => {
-      cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
-    };
-
-    grouped[vendor].forEach(p => {
-      const row = document.createElement('div');
-      row.className = 'product-row';
-      row.dataset.itemTitle = p.title;
-      row.innerHTML = `
-        <img src="${p.imageUrl}" alt="${p.title}">
-        <div class="product-details">
-          <div class="product-title">${p.title}</div>
-          <div class="can-size">${p.canSize}</div>
-        </div>
-        <div class="qty-inputs">
-          <label>Cans</label>
-          <input type="number" min="0" data-price="${p.canPrice}">
-          <label>Cases</label>
-          <input type="number" min="0" data-price="${p.casePrice}">
-        </div>
-      `;
-      cont.append(row);
+  <script>
+  (async () => {
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
+    const text = await fetch(sheetUrl).then(r => r.text());
+    const rows = text.split('\n').slice(1).map(r => r.split(','));
+    const grouped = {};
+    rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
+      if (!title || status.trim().toLowerCase() !== 'yes') return;
+      const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
+      grouped[vendor] = grouped[vendor] || [];
+      const cleanTitle = title
+        .replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
+        .replace(/\(Non-Alcoholic\)/i, '')
+        .trim();
+      grouped[vendor].push({
+        title: cleanTitle,
+        canSize,
+        canPrice: parseFloat(canPrice),
+        casePrice: parseFloat(casePrice),
+        imageUrl
+      });
     });
 
-    list.append(hdr, cont);
-  });
-
-  // 3) Search & jump-to-vendor
-  document.getElementById('searchBar').addEventListener('input', e => {
-    const q = e.target.value.toLowerCase();
-    document.querySelectorAll('.product-row').forEach(r => {
-      r.style.display = r.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
-    });
-  });
-  jump.addEventListener('change', e => {
-    const hdr = [...document.querySelectorAll('.vendor-header')]
-      .find(h => h.textContent.startsWith(e.target.value));
-    hdr && hdr.scrollIntoView({ behavior: 'smooth' });
-  });
-
-  // 4) Live total calculation
-  document.getElementById('productList').addEventListener('input', () => {
-    let total = 0;
-    document.querySelectorAll('.qty-inputs input').forEach(i => {
-      total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
-    });
-    document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
-  });
-
-  // 5) Submit via URL-encoded POST
-  const scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
-  document.getElementById('wholesaleForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    const form = e.target;
-
-    // buyer info
-    ['fullName','companyName','email'].forEach(k => {
-      params.append(k, form[k].value.trim());
+    const list = document.getElementById('productList');
+    const jump = document.getElementById('jumpVendor');
+    Object.keys(grouped).sort().forEach(vendor => {
+      jump.append(new Option(vendor, vendor));
+      const hdr = document.createElement('div');
+      hdr.className = 'vendor-header';
+      hdr.textContent = vendor + ' ▼';
+      const cont = document.createElement('div');
+      cont.className = 'vendor-products';
+      hdr.onclick = () => {
+        cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
+      };
+      grouped[vendor].forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'product-row';
+        row.dataset.itemTitle = p.title;
+        row.innerHTML = `
+          <img src="${p.imageUrl}" alt="${p.title}">
+          <div class="product-details">
+            <div class="product-title">${p.title}</div>
+            <div class="can-size">${p.canSize}</div>
+          </div>
+          <div class="qty-inputs">
+            <label>Cans</label>
+            <input type="number" min="0" data-price="${p.canPrice}">
+            <label>Cases</label>
+            <input type="number" min="0" data-price="${p.casePrice}">
+          </div>
+        `;
+        cont.append(row);
+      });
+      list.append(hdr, cont);
     });
 
-    // product lines
-    let idx = 0;
-    document.querySelectorAll('.product-row').forEach(row => {
-      const cans  = parseInt(row.querySelector('input:nth-of-type(1)').value) || 0;
-      const cases = parseInt(row.querySelector('input:nth-of-type(2)').value) || 0;
-      if (cans || cases) {
-        const title = row.dataset.itemTitle;
-        params.append(`item_${idx}_title`, title);
-        params.append(`item_${idx}_cans`,  cans);
-        params.append(`item_${idx}_cases`, cases);
-        idx++;
+    // Search & jump-to-vendor
+    document.getElementById('searchBar').addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('.product-row').forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    });
+    jump.addEventListener('change', e => {
+      const hdr = [...document.querySelectorAll('.vendor-header')]
+        .find(h => h.textContent.startsWith(e.target.value));
+      hdr && hdr.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Live total calculation
+    document.getElementById('productList').addEventListener('input', () => {
+      let total = 0;
+      document.querySelectorAll('.qty-inputs input').forEach(i => {
+        total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
+      });
+      document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
+    });
+
+    // Submit via URL-encoded POST with spinner
+    const form = document.getElementById('wholesaleForm');
+    const loader = document.getElementById('loader');
+    const scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      loader.style.display = 'block';
+
+      const params = new URLSearchParams();
+      ['fullName','companyName','email'].forEach(k => params.append(k, form[k].value.trim()));
+      let idx = 0;
+      document.querySelectorAll('.product-row').forEach(row => {
+        const cans  = parseInt(row.querySelector('input:nth-of-type(1)').value) || 0;
+        const cases = parseInt(row.querySelector('input:nth-of-type(2)').value) || 0;
+        if (cans || cases) {
+          const title = row.dataset.itemTitle;
+          params.append(`item_${idx}_title`, title);
+          params.append(`item_${idx}_cans`,  cans);
+          params.append(`item_${idx}_cases`, cases);
+          idx++;
+        }
+      });
+
+      try {
+        const resp = await fetch(scriptURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        });
+        if (!resp.ok) throw new Error('Network response not ok');
+        alert('✅ Order submitted! A rep will contact you shortly.');
+        form.reset();
+        document.getElementById('totalBox').textContent = 'Total Estimate: $0.00';
+        window.scrollTo(0,0);
+      } catch (err) {
+        console.error(err);
+        alert('⚠️ Error submitting order. Please try again.');
+      } finally {
+        loader.style.display = 'none';
       }
     });
-
-    // fire off
-    const resp = await fetch(scriptURL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
-    });
-
-    if (resp.ok) {
-      alert('✅ Order submitted! A rep will contact you shortly.');
-      form.reset();
-      document.getElementById('totalBox').textContent = 'Total Estimate: $0.00';
-      window.scrollTo(0,0);
-    } else {
-      alert('⚠️ Error submitting order. Please try again.');
-    }
-  });
-})();
-</script>
+  })();
+  </script>
 </body>
 </html>
