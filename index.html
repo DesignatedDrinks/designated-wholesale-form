@@ -32,6 +32,10 @@
     .form-actions { text-align: center; }
     .form-actions button { background: #001f3f; color: white; padding: 14px 30px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; }
     .form-actions button:hover { background: #003366; }
+    @media (max-width: 600px) {
+      .vendor-products, .product-row { flex-direction: column; align-items: flex-start; }
+      .qty-inputs { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -45,102 +49,158 @@
   <main>
     <div class="buyer-info">
       <label for="name">Full Name</label>
-      <input id="name" name="name" type="text" required>
+      <input id="name" name="fullName" type="text" required>
       <label for="company">Company Name</label>
-      <input id="company" name="company" type="text" required>
+      <input id="company" name="companyName" type="text" required>
       <label for="email">Email Address</label>
       <input id="email" name="email" type="email" required>
     </div>
+
     <div class="filters">
       <input id="searchBar" placeholder="Search products...">
       <select id="jumpVendor">
         <option value="">Jump to vendor...</option>
       </select>
     </div>
+
     <div id="productList"></div>
+
     <div id="totalBox">Total Estimate: $0.00</div>
+
     <div class="form-actions">
       <button type="submit">Submit Order</button>
     </div>
   </main>
 </form>
+
 <script>
 (async () => {
+  // 1) Fetch and parse CSV
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
   const text = await fetch(sheetUrl).then(r => r.text());
   const rows = text.split('\n').slice(1).map(r => r.split(','));
   const grouped = {};
-  rows.forEach(([title, canSize, , canWholesalePrice, imageUrl, price24Pack, status]) => {
+
+  rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
     if (!title || status.trim().toLowerCase() !== 'yes') return;
     const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
-    if (!grouped[vendor]) grouped[vendor] = [];
-    const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '').replace(/\(Non-Alcoholic\)/i, '').trim();
-    grouped[vendor].push({ title: cleanTitle, canSize, canPrice: parseFloat(canWholesalePrice), casePrice: parseFloat(price24Pack), imageUrl });
+    grouped[vendor] = grouped[vendor] || [];
+    const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
+                            .replace(/\(Non-Alcoholic\)/i, '').trim();
+    grouped[vendor].push({
+      title: cleanTitle,
+      canSize,
+      canPrice: parseFloat(canPrice),
+      casePrice: parseFloat(casePrice),
+      imageUrl
+    });
   });
 
+  // 2) Render products & vendor jump
   const list = document.getElementById('productList');
   const jump = document.getElementById('jumpVendor');
   Object.keys(grouped).sort().forEach(vendor => {
-    const opt = document.createElement('option'); opt.value = vendor; opt.textContent = vendor;
-    jump.append(opt);
-    const hdr = document.createElement('div'); hdr.className = 'vendor-header'; hdr.textContent = vendor + ' ▼';
-    const cont = document.createElement('div'); cont.className = 'vendor-products';
-    hdr.onclick = () => cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
+    jump.append(new Option(vendor, vendor));
+
+    const hdr = document.createElement('div');
+    hdr.className = 'vendor-header';
+    hdr.textContent = vendor + ' ▼';
+
+    const cont = document.createElement('div');
+    cont.className = 'vendor-products';
+
+    hdr.onclick = () => {
+      cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
+    };
+
     grouped[vendor].forEach(p => {
-      const row = document.createElement('div'); row.className = 'product-row';
+      const row = document.createElement('div');
+      row.className = 'product-row';
+      row.dataset.itemTitle = p.title;
       row.innerHTML = `
-        <img src="${p.imageUrl}" alt>
+        <img src="${p.imageUrl}" alt="${p.title}">
         <div class="product-details">
           <div class="product-title">${p.title}</div>
           <div class="can-size">${p.canSize}</div>
         </div>
         <div class="qty-inputs">
           <label>Cans</label>
-          <input type="number" name="${p.title}__cans" min="0" data-price="${p.canPrice}">
+          <input type="number" min="0" data-price="${p.canPrice}">
           <label>Cases</label>
-          <input type="number" name="${p.title}__cases" min="0" data-price="${p.casePrice}">
-        </div>`;
+          <input type="number" min="0" data-price="${p.casePrice}">
+        </div>
+      `;
       cont.append(row);
     });
+
     list.append(hdr, cont);
   });
 
+  // 3) Search & jump-to-vendor
   document.getElementById('searchBar').addEventListener('input', e => {
-    document.querySelectorAll('.product-row').forEach(r => r.style.display = r.textContent.toLowerCase().includes(e.target.value.toLowerCase()) ? 'flex' : 'none');
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll('.product-row').forEach(r => {
+      r.style.display = r.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+    });
   });
-
   jump.addEventListener('change', e => {
-    const hdr = Array.from(document.querySelectorAll('.vendor-header')).find(h => h.textContent.startsWith(e.target.value));
-    if (hdr) hdr.scrollIntoView({ behavior: 'smooth' });
+    const hdr = [...document.querySelectorAll('.vendor-header')]
+      .find(h => h.textContent.startsWith(e.target.value));
+    hdr && hdr.scrollIntoView({ behavior: 'smooth' });
   });
 
+  // 4) Live total calculation
   document.getElementById('productList').addEventListener('input', () => {
     let total = 0;
-    document.querySelectorAll('.qty-inputs input').forEach(i => total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price));
+    document.querySelectorAll('.qty-inputs input').forEach(i => {
+      total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
+    });
     document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
   });
 
-  // ✅ Fixed submission logic
+  // 5) Submit via URL-encoded POST
+  const scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
   document.getElementById('wholesaleForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const plain = {};
-    formData.forEach((v, k) => plain[k] = v);
+    const params = new URLSearchParams();
+    const form = e.target;
 
-    const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
+    // buyer info
+    ['fullName','companyName','email'].forEach(k => {
+      params.append(k, form[k].value.trim());
+    });
+
+    // product lines
+    let idx = 0;
+    document.querySelectorAll('.product-row').forEach(row => {
+      const cans  = parseInt(row.querySelector('input:nth-of-type(1)').value) || 0;
+      const cases = parseInt(row.querySelector('input:nth-of-type(2)').value) || 0;
+      if (cans || cases) {
+        const title = row.dataset.itemTitle;
+        params.append(`item_${idx}_title`, title);
+        params.append(`item_${idx}_cans`,  cans);
+        params.append(`item_${idx}_cases`, cases);
+        idx++;
+      }
+    });
+
+    // fire off
+    const resp = await fetch(scriptURL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(plain)
+      body: params.toString()
     });
 
     if (resp.ok) {
       alert('✅ Order submitted! A rep will contact you shortly.');
-      e.target.reset();
+      form.reset();
       document.getElementById('totalBox').textContent = 'Total Estimate: $0.00';
-      scrollTo(0, 0);
+      window.scrollTo(0,0);
     } else {
-      alert('⚠️ Error submitting order.');
+      alert('⚠️ Error submitting order. Please try again.');
     }
   });
 })();
 </script>
+</body>
+</html>
