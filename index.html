@@ -19,7 +19,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     header h1 { margin: 0; font-size: 28px; color: #001f3f; }
-    .submit-top { display: flex; align-items: center; gap: 12px; }
+    .submit-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
     .submit-top button {
       background: #001f3f;
       color: white;
@@ -30,13 +34,13 @@
       cursor: pointer;
     }
     .submit-top button:hover { background: #003366; }
-    .submit-top .order-total-header {
+    .order-total-header {
       font-size: 16px;
       font-weight: bold;
       color: #001f3f;
     }
     main { max-width: 1100px; margin: auto; padding: 20px; }
-    .buyer-info, .filters, .form-actions {
+    .buyer-info, .form-actions {
       background: white;
       border-radius: 12px;
       padding: 20px;
@@ -52,20 +56,6 @@
       margin-bottom: 15px;
       font-size: 16px;
     }
-    .filters {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .filters input, .filters select {
-      flex: 1;
-      min-width: 150px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
     .vendor-header {
       font-size: 20px;
       font-weight: bold;
@@ -78,15 +68,19 @@
       margin-top: 20px;
     }
     .vendor-products {
-      display: none;
-      flex-direction: column;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 16px;
       margin-top: 10px;
     }
     .product-row {
+      flex: 0 1 calc(50% - 16px);
+      max-width: 300px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
       padding: 12px;
       background: white;
       border-radius: 8px;
@@ -97,26 +91,45 @@
       height: 80px;
       object-fit: contain;
     }
-    .product-details { flex-grow: 1; }
-    .product-title {
-      font-weight: 600;
-      font-size: 18px;
-      margin-bottom: 4px;
-    }
+    .product-details { text-align: center; }
+    .product-title { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
     .can-size { font-size: 14px; color: #555; }
     .qty-inputs {
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 6px;
-      min-width: 100px;
     }
-    .qty-inputs label { font-size: 14px; }
-    .qty-inputs input {
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .qty-control button {
+      width: 32px;
+      height: 32px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-control input {
+      flex: 1;
+      text-align: center;
       padding: 8px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      width: 100%;
+      border-radius: 4px;
+      -moz-appearance: textfield;
+    }
+    .qty-control input::-webkit-outer-spin-button,
+    .qty-control input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
     }
     .form-actions { text-align: center; }
     .form-actions button {
@@ -130,12 +143,17 @@
     }
     .form-actions button:hover { background: #003366; }
     @media (max-width: 600px) {
-      .vendor-products, .product-row {
+      header {
         flex-direction: column;
-        align-items: flex-start;
+        text-align: center;
+        gap: 10px;
       }
-      .qty-inputs { width: 100%; }
-      header { flex-direction: column; gap: 10px; }
+      .submit-top { flex-direction: column; }
+      .vendor-products { flex-direction: column; }
+      .product-row {
+        flex: 1 1 100%;
+        max-width: none;
+      }
     }
     /* Loading spinner */
     #loader {
@@ -159,9 +177,7 @@
   </style>
 </head>
 <body>
-  <!-- Loader: shows while submitting -->
   <div id="loader"></div>
-
   <form id="wholesaleForm">
     <header>
       <h1>Wholesale Order Form</h1>
@@ -179,57 +195,40 @@
         <label for="email">Email Address</label>
         <input id="email" name="email" type="email" required>
       </div>
-
-      <div class="filters">
-        <input id="searchBar" placeholder="Search products...">
-        <select id="jumpVendor">
-          <option value="">Jump to vendor...</option>
-        </select>
-      </div>
-
       <div id="productList"></div>
-
       <div class="form-actions">
         <button type="submit">Submit Order</button>
       </div>
     </main>
   </form>
-
   <script>
   (async () => {
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
     const text = await fetch(sheetUrl).then(r => r.text());
     const rows = text.split('\n').slice(1).map(r => r.split(','));
     const grouped = {};
-
     rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
       if (!title || status.trim().toLowerCase() !== 'yes') return;
       const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
       grouped[vendor] = grouped[vendor] || [];
-      const cleanTitle = title
-        .replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
-        .replace(/\(Non-Alcoholic\)/i, '')
-        .trim();
-      grouped[vendor].push({
-        title: cleanTitle,
-        canSize,
-        casePrice: parseFloat(casePrice),
-        imageUrl
-      });
+      const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
+                              .replace(/\(Non-Alcoholic\)/i, '')
+                              .trim();
+      grouped[vendor].push({ title: cleanTitle, canSize, casePrice: parseFloat(casePrice), imageUrl });
     });
 
     const list = document.getElementById('productList');
-    const jump = document.getElementById('jumpVendor');
     Object.keys(grouped).sort().forEach(vendor => {
-      jump.append(new Option(vendor, vendor));
       const hdr = document.createElement('div');
       hdr.className = 'vendor-header';
       hdr.textContent = vendor + ' ▼';
+
       const cont = document.createElement('div');
       cont.className = 'vendor-products';
       hdr.onclick = () => {
         cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
       };
+
       grouped[vendor].forEach(p => {
         const row = document.createElement('div');
         row.className = 'product-row';
@@ -242,29 +241,22 @@
           </div>
           <div class="qty-inputs">
             <label>Cases</label>
-            <input type="number" min="0" data-price="${p.casePrice}">
+            <div class="qty-control">
+              <button type="button" class="qty-btn decrement">−</button>
+              <input type="number" min="0" value="0" data-price="${p.casePrice}">
+              <button type="button" class="qty-btn increment">+</button>
+            </div>
           </div>
         `;
         cont.append(row);
       });
-      list.append(hdr, cont);
-    });
 
-    document.getElementById('searchBar').addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('.product-row').forEach(r => {
-        r.style.display = r.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
-      });
-    });
-    jump.addEventListener('change', e => {
-      const hdr = [...document.querySelectorAll('.vendor-header')]
-        .find(h => h.textContent.startsWith(e.target.value));
-      hdr && hdr.scrollIntoView({ behavior: 'smooth' });
+      list.append(hdr, cont);
     });
 
     function updateTotals() {
       let total = 0;
-      document.querySelectorAll('.qty-inputs input').forEach(i => {
+      document.querySelectorAll('.qty-control input').forEach(i => {
         total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
       });
       document.querySelectorAll('.order-total-header').forEach(el => {
@@ -272,10 +264,19 @@
       });
     }
     document.getElementById('productList').addEventListener('input', updateTotals);
+    document.addEventListener('click', e => {
+      if (e.target.classList.contains('increment') || e.target.classList.contains('decrement')) {
+        const input = e.target.closest('.qty-control').querySelector('input');
+        let val = parseInt(input.value) || 0;
+        val += e.target.classList.contains('increment') ? 1 : -1;
+        input.value = val < 0 ? 0 : val;
+        updateTotals();
+      }
+    });
 
-    const form = document.getElementById('wholesaleForm');
-    const loader = document.getElementById('loader');
-    const scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
+    const form = document.getElementById('wholesaleForm'),
+          loader = document.getElementById('loader'),
+          scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
@@ -283,10 +284,13 @@
       updateTotals();
 
       const params = new URLSearchParams();
-      ['fullName','companyName','email'].forEach(k => params.append(k, form[k].value.trim()));
+      ['fullName','companyName','email'].forEach(k => {
+        params.append(k, form[k].value.trim());
+      });
+
       let idx = 0;
       document.querySelectorAll('.product-row').forEach(row => {
-        const cases = parseInt(row.querySelector('input').value) || 0;
+        const cases = parseInt(row.querySelector('.qty-control input').value) || 0;
         if (cases) {
           params.append(`item_${idx}_title`, row.dataset.itemTitle);
           params.append(`item_${idx}_cases`, cases);
