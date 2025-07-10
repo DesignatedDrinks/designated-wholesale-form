@@ -189,7 +189,7 @@ document.getElementById('wholesaleForm').addEventListener('submit', async functi
   const data = new FormData(this);
   const payload = Object.fromEntries(data.entries());
 
-  const response = await fetch('https://script.google.com/macros/s/YOUR_DEPLOYED_SCRIPT_URL/exec', {
+  const response = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: { 'Content-Type': 'application/json' }
