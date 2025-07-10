@@ -3,30 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>Designated Drinks Wholesale Order Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background: #f2f5f9; color: #333; }
-    header { background: white; padding: 20px 30px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; position: sticky; top: 0; z-index: 1000; }
-    header h1 { font-size: 28px; margin: 0; color: #001f3f; }
-    .submit-top { margin-top: 10px; }
-    .submit-top button { background: #001f3f; color: white; padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; }
-    .submit-top button:hover { background: #003366; }
-    main { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
-    .buyer-info, .product-row, .form-actions { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px; }
-    .product-row { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
-    .product-row img { width: 90px; height: 90px; object-fit: contain; }
-    .product-details { flex-grow: 1; }
-    .product-title { font-weight: bold; font-size: 18px; margin-bottom: 4px; }
-    .can-size { font-size: 14px; color: #555; }
-    .qty-inputs { display: flex; flex-direction: column; gap: 6px; min-width: 100px; }
-    .qty-inputs input { padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; width: 100px; }
-    .buyer-info label, .qty-inputs label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .buyer-info input { padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; width: 100%; margin-bottom: 15px; }
-    .form-actions { text-align: center; }
-    .form-actions button { background: #001f3f; color: white; padding: 14px 30px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; }
-    .form-actions button:hover { background: #003366; }
-    #totalBox { background: #fff4e5; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+    body{font-family:'Montserrat',sans-serif;margin:0;padding:0;background:#f2f5f9;color:#333}
+    header{background:white;position:sticky;top:0;z-index:1000;padding:20px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
+    header h1{margin:0;font-size:28px;color:#001f3f}
+    .submit-top{margin-top:10px}
+    .submit-top button{background:#001f3f;color:white;padding:10px 20px;border:none;border-radius:6px;cursor:pointer}
+    .submit-top button:hover{background:#003366}
+    main{max-width:1100px;margin:auto;padding:20px}
+    .buyer-info, .filters, .vendor-section, .form-actions{background:white;border-radius:12px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.08);margin-bottom:20px}
+    .buyer-info label{display:block;margin-bottom:6px;font-weight:600}
+    .buyer-info input{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin-bottom:15px;font-size:16px}
+    .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+    .filters input, .filters select{flex:1;min-width:150px;padding:10px;font-size:16px;border:1px solid #ccc;border-radius:8px}
+    .vendor-header{font-size:20px;font-weight:bold;color:#001f3f;padding:10px;background:#f9fafb;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;margin-bottom:10px}
+    .vendor-products{display:none;flex-direction:column;gap:16px;margin-bottom:10px}
+    .product-row{display:flex;align-items:center;gap:20px;padding:10px;border:1px solid #eee;border-radius:8px}
+    .product-row img{width:70px;height:70px;object-fit:contain}
+    .product-details{flex:1}
+    .product-title{font-size:18px;font-weight:600;margin-bottom:4px}
+    .can-size{font-size:14px;color:#555}
+    .qty-inputs{display:flex;gap:10px;align-items:flex-end}
+    .qty-inputs label{font-size:14px}
+    .qty-inputs input{width:80px;padding:6px;border:1px solid #ccc;border-radius:6px}
+    #totalBox{background:#fff4e5;padding:15px;border-radius:10px;text-align:center;font-size:18px;font-weight:bold;margin-bottom:20px}
+    .form-actions{text-align:center}
+    .form-actions button{background:#001f3f;color:white;padding:14px 30px;font-size:18px;border:none;border-radius:8px;cursor:pointer}
+    .form-actions button:hover{background:#003366}
   </style>
 </head>
 <body>
@@ -37,66 +42,72 @@
   </header>
   <main>
     <div class="buyer-info">
-      <label for="name">Full Name</label><input type="text" id="name" name="name" required>
-      <label for="company">Company Name</label><input type="text" id="company" name="company" required>
-      <label for="email">Email Address</label><input type="email" id="email" name="email" required>
+      <label for="name">Full Name</label>
+      <input id="name" name="name" type="text" required>
+      <label for="company">Company Name</label>
+      <input id="company" name="company" type="text" required>
+      <label for="email">Email Address</label>
+      <input id="email" name="email" type="email" required>
     </div>
-    <div id="productList"><!-- Products will load here --></div>
+    <div class="filters">
+      <input id="searchBar" placeholder="Search products...">
+      <select id="jumpVendor"><option value="">Jump to vendor...</option></select>
+    </div>
+    <div id="productList"></div>
     <div id="totalBox">Total Estimate: $0.00</div>
     <div class="form-actions"><button type="submit">Submit Order</button></div>
   </main>
 </form>
 <script>
-async function loadProducts() {
-  const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
-  try {
-    const res = await fetch(sheetUrl);
-    const csv = await res.text();
-    if (!csv) throw new Error('Empty CSV');
-    const rows = csv.split('\n').slice(1).map(r=>r.split(','));
-    const list=document.getElementById('productList');
-    rows.forEach(([title,canSize,,,imageUrl,price,status])=>{
-      if(!title||status.trim().toLowerCase()!=='yes')return;
-      const id=title.replace(/\s+/g,'_').toLowerCase();
-      const div=document.createElement('div');div.className='product-row';
-      div.innerHTML=`
-        <img src="${imageUrl}" alt="${title}">
-        <div class="product-details">
-          <div class="product-title">${title}</div>
-          <div class="can-size">${canSize}</div>
-        </div>
-        <div class="qty-inputs">
-          <label for="${id}_cans">Cans</label>
-          <input type="number" id="${id}_cans" name="${title}__cans" min="0" step="1" data-price="${parseFloat(price)}">
-          <label for="${id}_cases">Cases</label>
-          <input type="number" id="${id}_cases" name="${title}__cases" min="0" step="1" data-price="${(parseFloat(price)*24).toFixed(2)}">
-        </div>`;
-      list.appendChild(div);
-    });
-    list.addEventListener('input',updateTotal);
-  }catch(err){
-    console.error('Product load error:',err);
-    document.getElementById('productList').innerHTML='<p style="color:red;">Error loading products. Please make the sheet public.</p>';
-  }
-}
-function updateTotal(){
-  let total=0;
-  document.querySelectorAll('#productList input').forEach(inp=>{
-    const qty=parseInt(inp.value)||0,price=parseFloat(inp.dataset.price)||0;
-    total+=qty*price;
+(async ()=>{
+  const sheetUrl='https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
+  const text=await fetch(sheetUrl).then(r=>r.text());
+  const rows=text.split('\n').slice(1).map(r=>r.split(','));
+  const grouped={};
+  rows.forEach(([title,canSize,,canPrice,imageUrl,casePrice,status])=>{
+    if(!title||status.trim().toLowerCase()!=='yes')return;
+    const vendor=(title.match(/^(.+?)\s\(/)||['Other'])[1];
+    (grouped[vendor]||(grouped[vendor]=[])).push({title,canSize,canPrice:parseFloat(canPrice),casePrice:parseFloat(casePrice),imageUrl});
   });
-  document.getElementById('totalBox').innerText=`Total Estimate: $${total.toFixed(2)}`;
-}
-document.getElementById('wholesaleForm').addEventListener('submit',async function(e){
-  e.preventDefault();console.log('Submit clicked');
-  const data=Object.fromEntries(new FormData(this).entries());
-  try{
-    const resp=await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec',{method:'POST',body:JSON.stringify(data)});
-    const text=await resp.text();console.log('Server response:',text);
-    if(resp.ok){alert('Order submitted! A rep will contact you shortly.');this.reset();updateTotal();window.scrollTo(0,0);}else throw new Error('Network response was not OK');
-  }catch(err){console.error('Submit error:',err);alert('Error submitting order. Check console.');}
-});
-loadProducts();
+  const list=document.getElementById('productList');
+  const jump=document.getElementById('jumpVendor');
+  Object.keys(grouped).forEach(vendor=>{
+    // jump menu
+    const opt=new Option(vendor,vendor);jump.add(opt);
+    // section
+    const sec=document.createElement('div'),hdr=document.createElement('div'),cont=document.createElement('div');
+    hdr.className='vendor-header';hdr.textContent=vendor+' ⬇️';
+    cont.className='vendor-products';
+    hdr.onclick=()=>cont.style.display=cont.style.display==='flex'?'none':'flex';
+    grouped[vendor].forEach(p=>{
+      const row=document.createElement('div');row.className='product-row';
+      row.innerHTML=`<img src="${p.imageUrl}" alt><div class="product-details"><div class="product-title">${p.title}</div><div class="can-size">${p.canSize}</div></div><div class="qty-inputs"><label>Cans</label><input type="number" name="${p.title}__cans" min="0" data-price="${p.canPrice}"><label>Cases</label><input type="number" name="${p.title}__cases" min="0" data-price="${p.casePrice}"></div>`;
+      cont.appendChild(row);
+    });
+    list.append(hdr,cont);
+  });
+  document.getElementById('searchBar').oninput=e=>{
+    const q=e.target.value.toLowerCase();
+    document.querySelectorAll('.product-row').forEach(r=>{
+      r.style.display=r.textContent.toLowerCase().includes(q)?'flex':'none';
+    });
+  };
+  jump.onchange=e=>{
+    const hdr=[...document.querySelectorAll('.vendor-header')].find(h=>h.textContent.startsWith(e.target.value));
+    hdr&&hdr.scrollIntoView({behavior:'smooth'});
+  };
+  document.getElementById('productList').addEventListener('input',()=>{
+    let total=0;
+    document.querySelectorAll('.qty-inputs input').forEach(i=>total+= (parseInt(i.value)||0)*parseFloat(i.dataset.price));
+    document.getElementById('totalBox').textContent=`Total Estimate: $${total.toFixed(2)}`;
+  });
+  document.getElementById('wholesaleForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const data=Object.fromEntries(new FormData(e.target).entries());
+    const resp=await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    if(resp.ok){alert('Order submitted!');e.target.reset();document.getElementById('totalBox').textContent='Total Estimate: $0.00';scrollTo(0,0);}else alert('Error submitting.');
+  });
+})();
 </script>
 </body>
 </html>
