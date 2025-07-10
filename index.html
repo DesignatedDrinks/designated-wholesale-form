@@ -66,9 +66,10 @@
       border-radius: 8px;
       cursor: pointer;
       margin-top: 20px;
+      user-select: none;
     }
     .vendor-products {
-      display: flex;
+      display: none;           /* collapsed by default */
       flex-wrap: wrap;
       justify-content: center;
       gap: 16px;
@@ -131,7 +132,6 @@
       -webkit-appearance: none;
       margin: 0;
     }
-    .form-actions { text-align: center; }
     .form-actions button {
       background: #001f3f;
       color: white;
@@ -178,6 +178,7 @@
 </head>
 <body>
   <div id="loader"></div>
+
   <form id="wholesaleForm">
     <header>
       <h1>Wholesale Order Form</h1>
@@ -186,6 +187,7 @@
         <span class="order-total-header">Total: $0.00</span>
       </div>
     </header>
+
     <main>
       <div class="buyer-info">
         <label for="name">Full Name</label>
@@ -195,30 +197,38 @@
         <label for="email">Email Address</label>
         <input id="email" name="email" type="email" required>
       </div>
+
       <div id="productList"></div>
+
       <div class="form-actions">
         <button type="submit">Submit Order</button>
       </div>
     </main>
   </form>
+
   <script>
   (async () => {
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
     const text = await fetch(sheetUrl).then(r => r.text());
     const rows = text.split('\n').slice(1).map(r => r.split(','));
     const grouped = {};
+
     rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
       if (!title || status.trim().toLowerCase() !== 'yes') return;
       const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
-      grouped[vendor] = grouped[vendor] || [];
       const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
                               .replace(/\(Non-Alcoholic\)/i, '')
                               .trim();
-      grouped[vendor].push({ title: cleanTitle, canSize, casePrice: parseFloat(casePrice), imageUrl });
+      (grouped[vendor] = grouped[vendor] || []).push({
+        title: cleanTitle,
+        canSize,
+        casePrice: parseFloat(casePrice),
+        imageUrl
+      });
     });
 
     const list = document.getElementById('productList');
-    Object.keys(grouped).sort().forEach(vendor => {
+    Object.entries(grouped).sort().forEach(([vendor, products]) => {
       const hdr = document.createElement('div');
       hdr.className = 'vendor-header';
       hdr.textContent = vendor + ' ▼';
@@ -229,7 +239,7 @@
         cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
       };
 
-      grouped[vendor].forEach(p => {
+      products.forEach(p => {
         const row = document.createElement('div');
         row.className = 'product-row';
         row.dataset.itemTitle = p.title;
@@ -257,7 +267,7 @@
     function updateTotals() {
       let total = 0;
       document.querySelectorAll('.qty-control input').forEach(i => {
-        total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
+        total += (parseInt(i.value)||0)*parseFloat(i.dataset.price);
       });
       document.querySelectorAll('.order-total-header').forEach(el => {
         el.textContent = `Total: $${total.toFixed(2)}`;
@@ -265,11 +275,11 @@
     }
     document.getElementById('productList').addEventListener('input', updateTotals);
     document.addEventListener('click', e => {
-      if (e.target.classList.contains('increment') || e.target.classList.contains('decrement')) {
+      if (e.target.classList.contains('increment')||e.target.classList.contains('decrement')) {
         const input = e.target.closest('.qty-control').querySelector('input');
-        let val = parseInt(input.value) || 0;
-        val += e.target.classList.contains('increment') ? 1 : -1;
-        input.value = val < 0 ? 0 : val;
+        let val = parseInt(input.value)||0;
+        val += e.target.classList.contains('increment')?1:-1;
+        input.value = val<0?0:val;
         updateTotals();
       }
     });
@@ -284,16 +294,14 @@
       updateTotals();
 
       const params = new URLSearchParams();
-      ['fullName','companyName','email'].forEach(k => {
-        params.append(k, form[k].value.trim());
-      });
+      ['fullName','companyName','email'].forEach(k => params.append(k, form[k].value.trim()));
 
       let idx = 0;
       document.querySelectorAll('.product-row').forEach(row => {
-        const cases = parseInt(row.querySelector('.qty-control input').value) || 0;
-        if (cases) {
+        const cnt = parseInt(row.querySelector('.qty-control input').value)||0;
+        if (cnt) {
           params.append(`item_${idx}_title`, row.dataset.itemTitle);
-          params.append(`item_${idx}_cases`, cases);
+          params.append(`item_${idx}_cases`,  cnt);
           idx++;
         }
       });
