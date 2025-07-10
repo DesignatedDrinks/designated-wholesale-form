@@ -7,37 +7,137 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background: #f2f5f9; color: #333; }
-    header { background: white; position: sticky; top: 0; z-index: 1000; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    header {
+      background: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
     header h1 { margin: 0; font-size: 28px; color: #001f3f; }
-    .submit-top { margin-top: 10px; }
-    .submit-top button { background: #001f3f; color: white; padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; }
+    .submit-top { display: flex; align-items: center; gap: 12px; }
+    .submit-top button {
+      background: #001f3f;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
     .submit-top button:hover { background: #003366; }
+    .submit-top .order-total-header {
+      font-size: 16px;
+      font-weight: bold;
+      color: #001f3f;
+    }
     main { max-width: 1100px; margin: auto; padding: 20px; }
-    .buyer-info, .filters, .form-actions { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .buyer-info, .filters, .form-actions {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
     .buyer-info label { display: block; margin-bottom: 6px; font-weight: 600; }
-    .buyer-info input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; font-size: 16px; }
-    .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .filters input, .filters select { flex: 1; min-width: 150px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-    .vendor-header { font-size: 20px; font-weight: bold; color: #001f3f; padding: 12px; background: #f9fafb; border: 1px solid #cbd5e1; border-radius: 8px; cursor: pointer; margin-top: 20px; }
-    .vendor-products { display: none; flex-direction: column; gap: 16px; margin-top: 10px; }
-    .product-row { display: flex; align-items: center; gap: 20px; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 1px 5px rgba(0,0,0,0.05); }
-    .product-row img { width: 80px; height: 80px; object-fit: contain; }
+    .buyer-info input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters input, .filters select {
+      flex: 1;
+      min-width: 150px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .vendor-header {
+      font-size: 20px;
+      font-weight: bold;
+      color: #001f3f;
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .vendor-products {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 10px;
+    }
+    .product-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    }
+    .product-row img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
     .product-details { flex-grow: 1; }
-    .product-title { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
+    .product-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
     .can-size { font-size: 14px; color: #555; }
-    .qty-inputs { display: flex; flex-direction: column; gap: 6px; min-width: 100px; }
+    .qty-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 100px;
+    }
     .qty-inputs label { font-size: 14px; }
-    .qty-inputs input { padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; width: 100%; }
-    #totalBox { background: #fff4e5; padding: 15px; border-radius: 10px; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+    .qty-inputs input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+    }
     .form-actions { text-align: center; }
-    .form-actions button { background: #001f3f; color: white; padding: 14px 30px; font-size: 18px; border: none; border-radius: 8px; cursor: pointer; }
+    .form-actions button {
+      background: #001f3f;
+      color: white;
+      padding: 14px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
     .form-actions button:hover { background: #003366; }
     @media (max-width: 600px) {
-      .vendor-products, .product-row { flex-direction: column; align-items: flex-start; }
+      .vendor-products, .product-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
       .qty-inputs { width: 100%; }
+      header { flex-direction: column; gap: 10px; }
     }
-
-    /* Loading spinner styles */
+    /* Loading spinner */
     #loader {
       display: none;
       position: fixed;
@@ -59,7 +159,7 @@
   </style>
 </head>
 <body>
-  <!-- Loader: shows while the form is submitting -->
+  <!-- Loader: shows while submitting -->
   <div id="loader"></div>
 
   <form id="wholesaleForm">
@@ -67,6 +167,7 @@
       <h1>Wholesale Order Form</h1>
       <div class="submit-top">
         <button type="submit">Submit Order</button>
+        <span class="order-total-header">Total: $0.00</span>
       </div>
     </header>
     <main>
@@ -88,8 +189,6 @@
 
       <div id="productList"></div>
 
-      <div id="totalBox">Total Estimate: $0.00</div>
-
       <div class="form-actions">
         <button type="submit">Submit Order</button>
       </div>
@@ -102,6 +201,7 @@
     const text = await fetch(sheetUrl).then(r => r.text());
     const rows = text.split('\n').slice(1).map(r => r.split(','));
     const grouped = {};
+
     rows.forEach(([title, canSize, , canPrice, imageUrl, casePrice, status]) => {
       if (!title || status.trim().toLowerCase() !== 'yes') return;
       const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
@@ -113,7 +213,6 @@
       grouped[vendor].push({
         title: cleanTitle,
         canSize,
-        canPrice: parseFloat(canPrice),
         casePrice: parseFloat(casePrice),
         imageUrl
       });
@@ -142,8 +241,6 @@
             <div class="can-size">${p.canSize}</div>
           </div>
           <div class="qty-inputs">
-            <label>Cans</label>
-            <input type="number" min="0" data-price="${p.canPrice}">
             <label>Cases</label>
             <input type="number" min="0" data-price="${p.casePrice}">
           </div>
@@ -153,7 +250,6 @@
       list.append(hdr, cont);
     });
 
-    // Search & jump-to-vendor
     document.getElementById('searchBar').addEventListener('input', e => {
       const q = e.target.value.toLowerCase();
       document.querySelectorAll('.product-row').forEach(r => {
@@ -166,16 +262,17 @@
       hdr && hdr.scrollIntoView({ behavior: 'smooth' });
     });
 
-    // Live total calculation
-    document.getElementById('productList').addEventListener('input', () => {
+    function updateTotals() {
       let total = 0;
       document.querySelectorAll('.qty-inputs input').forEach(i => {
         total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price);
       });
-      document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
-    });
+      document.querySelectorAll('.order-total-header').forEach(el => {
+        el.textContent = `Total: $${total.toFixed(2)}`;
+      });
+    }
+    document.getElementById('productList').addEventListener('input', updateTotals);
 
-    // Submit via URL-encoded POST with spinner
     const form = document.getElementById('wholesaleForm');
     const loader = document.getElementById('loader');
     const scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
@@ -183,17 +280,15 @@
     form.addEventListener('submit', async e => {
       e.preventDefault();
       loader.style.display = 'block';
+      updateTotals();
 
       const params = new URLSearchParams();
       ['fullName','companyName','email'].forEach(k => params.append(k, form[k].value.trim()));
       let idx = 0;
       document.querySelectorAll('.product-row').forEach(row => {
-        const cans  = parseInt(row.querySelector('input:nth-of-type(1)').value) || 0;
-        const cases = parseInt(row.querySelector('input:nth-of-type(2)').value) || 0;
-        if (cans || cases) {
-          const title = row.dataset.itemTitle;
-          params.append(`item_${idx}_title`, title);
-          params.append(`item_${idx}_cans`,  cans);
+        const cases = parseInt(row.querySelector('input').value) || 0;
+        if (cases) {
+          params.append(`item_${idx}_title`, row.dataset.itemTitle);
           params.append(`item_${idx}_cases`, cases);
           idx++;
         }
@@ -208,7 +303,7 @@
         if (!resp.ok) throw new Error('Network response not ok');
         alert('✅ Order submitted! A rep will contact you shortly.');
         form.reset();
-        document.getElementById('totalBox').textContent = 'Total Estimate: $0.00';
+        updateTotals();
         window.scrollTo(0,0);
       } catch (err) {
         console.error(err);
