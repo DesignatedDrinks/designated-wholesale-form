@@ -121,10 +121,11 @@
     const formData = new FormData(e.target);
     const plain = {};
     formData.forEach((v, k) => plain[k] = v);
-    const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
-      method: 'POST',
-      body: new URLSearchParams(plain)
-    });
+   const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(plain)
+});
     if (resp.ok) {
       alert('✅ Order submitted! A rep will contact you shortly.');
       e.target.reset();
