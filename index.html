@@ -74,9 +74,7 @@
     if (!title || status.trim().toLowerCase() !== 'yes') return;
     const vendor = (title.match(/^(.+?)\s\(/) || ['Other'])[1];
     if (!grouped[vendor]) grouped[vendor] = [];
-    // Remove vendor prefix and '(Non-Alcoholic)' for display
-    const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
-      .replace(/\(Non-Alcoholic\)/i, '').trim();
+    const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '').replace(/\(Non-Alcoholic\)/i, '').trim();
     grouped[vendor].push({ title: cleanTitle, canSize, canPrice: parseFloat(canWholesalePrice), casePrice: parseFloat(price24Pack), imageUrl });
   });
   const list = document.getElementById('productList');
@@ -117,16 +115,24 @@
     document.querySelectorAll('.qty-inputs input').forEach(i => total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price));
     document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
   });
+
   document.getElementById('wholesaleForm').addEventListener('submit', async e => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.target).entries());
+    const formData = new FormData(e.target);
+    const plain = {};
+    formData.forEach((v, k) => plain[k] = v);
     const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+      method: 'POST',
+      body: new URLSearchParams(plain)
     });
     if (resp.ok) {
-      alert('Order submitted! A rep will contact you shortly.');
-      e.target.reset(); document.getElementById('totalBox').textContent = 'Total Estimate: $0.00'; scrollTo(0,0);
-    } else alert('Error submitting order.');
+      alert('✅ Order submitted! A rep will contact you shortly.');
+      e.target.reset();
+      document.getElementById('totalBox').textContent = 'Total Estimate: $0.00';
+      scrollTo(0, 0);
+    } else {
+      alert('⚠️ Error submitting order.');
+    }
   });
 })();
 </script>
