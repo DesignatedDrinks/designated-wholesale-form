@@ -77,6 +77,7 @@
     const cleanTitle = title.replace(new RegExp('^' + vendor + '\\s*', 'i'), '').replace(/\(Non-Alcoholic\)/i, '').trim();
     grouped[vendor].push({ title: cleanTitle, canSize, canPrice: parseFloat(canWholesalePrice), casePrice: parseFloat(price24Pack), imageUrl });
   });
+
   const list = document.getElementById('productList');
   const jump = document.getElementById('jumpVendor');
   Object.keys(grouped).sort().forEach(vendor => {
@@ -103,29 +104,35 @@
     });
     list.append(hdr, cont);
   });
+
   document.getElementById('searchBar').addEventListener('input', e => {
     document.querySelectorAll('.product-row').forEach(r => r.style.display = r.textContent.toLowerCase().includes(e.target.value.toLowerCase()) ? 'flex' : 'none');
   });
+
   jump.addEventListener('change', e => {
     const hdr = Array.from(document.querySelectorAll('.vendor-header')).find(h => h.textContent.startsWith(e.target.value));
     if (hdr) hdr.scrollIntoView({ behavior: 'smooth' });
   });
+
   document.getElementById('productList').addEventListener('input', () => {
     let total = 0;
     document.querySelectorAll('.qty-inputs input').forEach(i => total += (parseInt(i.value) || 0) * parseFloat(i.dataset.price));
     document.getElementById('totalBox').textContent = `Total Estimate: $${total.toFixed(2)}`;
   });
 
+  // ✅ Fixed submission logic
   document.getElementById('wholesaleForm').addEventListener('submit', async e => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const plain = {};
     formData.forEach((v, k) => plain[k] = v);
-   const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(plain)
-});
+
+    const resp = await fetch('https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(plain)
+    });
+
     if (resp.ok) {
       alert('✅ Order submitted! A rep will contact you shortly.');
       e.target.reset();
@@ -137,5 +144,3 @@
   });
 })();
 </script>
-</body>
-</html>
