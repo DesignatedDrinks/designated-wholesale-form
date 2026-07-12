@@ -101,6 +101,49 @@
     #statusBanner.is-success { border-color: #abefc6; background: #ecfdf3; color: var(--success); }
     #statusBanner.is-error { border-color: #fecdca; background: #fef3f2; color: var(--danger); }
 
+    #submitOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 3000;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(2px);
+    }
+
+    #submitOverlay.is-visible {
+      display: flex;
+    }
+
+    .submit-loader-card {
+      display: flex;
+      min-width: 190px;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      border-radius: 14px;
+      padding: 24px 28px;
+      background: white;
+      box-shadow: 0 12px 35px rgba(0, 31, 63, 0.16);
+      color: var(--navy);
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .submit-spinner {
+      width: 44px;
+      height: 44px;
+      border: 5px solid #dfe6ed;
+      border-top-color: var(--navy);
+      border-radius: 50%;
+      animation: submitSpin 0.75s linear infinite;
+    }
+
+    @keyframes submitSpin {
+      to { transform: rotate(360deg); }
+    }
+
     main {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 340px;
@@ -430,6 +473,13 @@
 </head>
 
 <body>
+  <div id="submitOverlay" role="status" aria-live="assertive" aria-hidden="true">
+    <div class="submit-loader-card">
+      <div class="submit-spinner" aria-hidden="true"></div>
+      <div>Submitting order…</div>
+    </div>
+  </div>
+
   <form id="wholesaleForm" novalidate>
     <header>
       <h1>Wholesale Order Form</h1>
@@ -509,11 +559,9 @@
         "https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv";
 
       const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbzB69xjVcQXBRvhSdCGuZJ0RClHjV-iFWVh4dMvvfTpLd6i9ZP3SA7k87EA2MxdI3QkcQ/exec";
+        "https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec";
 
       const HST_RATE = 0.13;
-      const STATUS_TIMEOUT_MS = 60000;
-      const STATUS_POLL_MS = 1000;
 
       const form = document.getElementById("wholesaleForm");
       const productList = document.getElementById("productList");
@@ -527,6 +575,7 @@
       const expandAllBtn = document.getElementById("expandAllBtn");
       const collapseAllBtn = document.getElementById("collapseAllBtn");
       const statusBanner = document.getElementById("statusBanner");
+      const submitOverlay = document.getElementById("submitOverlay");
       const submitButtons = form.querySelectorAll('button[type="submit"]');
 
       let submissionInProgress = false;
@@ -633,10 +682,17 @@
       function setSubmitting(isSubmitting) {
         submissionInProgress = isSubmitting;
 
+        submitOverlay.classList.toggle("is-visible", isSubmitting);
+        submitOverlay.setAttribute("aria-hidden", String(!isSubmitting));
+
         submitButtons.forEach(button => {
           button.disabled = isSubmitting;
           button.textContent = isSubmitting ? "Submitting…" : "Submit Order";
         });
+      }
+
+      function delay(milliseconds) {
+        return new Promise(resolve => window.setTimeout(resolve, milliseconds));
       }
 
       function createSubmissionId() {
@@ -849,66 +905,6 @@
         });
       }
 
-      function jsonpStatus(submissionId) {
-        return new Promise((resolve, reject) => {
-          const callbackName = "ddWholesaleStatus_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-          const script = document.createElement("script");
-          let finished = false;
-
-          function cleanup() {
-            if (finished) return;
-            finished = true;
-            delete window[callbackName];
-            script.remove();
-          }
-
-          const timeout = window.setTimeout(() => {
-            cleanup();
-            reject(new Error("Status request timed out."));
-          }, 8000);
-
-          window[callbackName] = payload => {
-            window.clearTimeout(timeout);
-            cleanup();
-            resolve(payload);
-          };
-
-          script.onerror = () => {
-            window.clearTimeout(timeout);
-            cleanup();
-            reject(new Error("Status request failed."));
-          };
-
-          script.src =
-            SCRIPT_URL +
-            "?action=status" +
-            "&submissionId=" + encodeURIComponent(submissionId) +
-            "&callback=" + encodeURIComponent(callbackName) +
-            "&_=" + Date.now();
-
-          document.head.appendChild(script);
-        });
-      }
-
-      async function waitForSubmission(submissionId) {
-        const startedAt = Date.now();
-
-        while (Date.now() - startedAt < STATUS_TIMEOUT_MS) {
-          try {
-            const result = await jsonpStatus(submissionId);
-
-            if (result && result.status === "success") return result;
-            if (result && result.status === "error") throw new Error(result.message || "The order could not be processed.");
-          } catch (error) {
-            if (error.message && !/Status request/.test(error.message)) throw error;
-          }
-
-          await new Promise(resolve => window.setTimeout(resolve, STATUS_POLL_MS));
-        }
-
-        throw new Error("The order may have been received, but the confirmation could not be loaded. Check your email or the Orders sheet before submitting it again.");
-      }
-
       productList.addEventListener("click", event => {
         const button = event.target.closest(".increment, .decrement");
         if (!button) return;
@@ -985,45 +981,46 @@
 
         try {
           /*
-           * Wait for the POST request to finish before starting the
-           * confirmation countdown. Apps Script may need time to write
-           * the order and send email, and the old version started the
-           * countdown too early.
+           * Send the order once. The browser cannot read the cross-origin
+           * Apps Script response, but a resolved no-cors request means the
+           * request was handed off successfully. Do not hold the customer
+           * on-screen while a second confirmation service is polled.
            */
-          let postError = null;
+          const postResultPromise = fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: params,
+            keepalive: true
+          })
+            .then(() => ({ ok: true }))
+            .catch(error => ({ ok: false, error }));
 
-          try {
-            await fetch(SCRIPT_URL, {
-              method: "POST",
-              mode: "no-cors",
-              body: params
-            });
-          } catch (error) {
-            /*
-             * A cross-origin browser error does not always mean the POST
-             * failed. Continue to the status check because Apps Script may
-             * still have received and saved the order.
-             */
-            postError = error;
-            console.warn("Wholesale POST response could not be read:", error);
+          /*
+           * Keep the loading wheel visible long enough to feel deliberate,
+           * but never trap the customer behind it for a minute.
+           */
+          const result = await Promise.race([
+            Promise.all([
+              postResultPromise,
+              delay(1200)
+            ]).then(values => values[0]),
+
+            delay(2200).then(() => ({
+              ok: true,
+              stillSending: true
+            }))
+          ]);
+
+          if (!result.ok) {
+            throw result.error || new Error("The order could not be sent.");
           }
 
-          const result = await waitForSubmission(submissionId);
-
-          if (!result || result.status !== "success") {
-            throw postError || new Error("The order could not be confirmed.");
-          }
-
-          const confirmedTotal = Number(result.total);
-          const totalText = Number.isFinite(confirmedTotal) ? money(confirmedTotal) : money(totals.total);
-          const orderReference = result.orderId ? " Reference: " + result.orderId + "." : "";
-
-          const warnings = Array.isArray(result.warnings) ? result.warnings : [];
-          const confirmationText = warnings.includes("customer-email")
-            ? " The order was saved, but the confirmation email could not be sent."
-            : " A confirmation email has been sent.";
-
-          setStatus("success", "Order submitted successfully for " + totalText + "." + orderReference + confirmationText);
+          setStatus(
+            "success",
+            "Order submitted successfully for " +
+              money(totals.total) +
+              ". A confirmation email will follow."
+          );
 
           document.querySelectorAll(".qty-control input").forEach(input => {
             input.value = 0;
@@ -1031,9 +1028,34 @@
 
           updateTotals();
           window.scrollTo({ top: 0, behavior: "smooth" });
+
+          /*
+           * If the request was still finishing when the two-second screen
+           * ended, check it quietly in the background.
+           */
+          if (result.stillSending) {
+            postResultPromise.then(backgroundResult => {
+              if (!backgroundResult.ok) {
+                console.error(
+                  "Wholesale submission failed after the loading screen closed:",
+                  backgroundResult.error
+                );
+
+                setStatus(
+                  "error",
+                  "The order could not be sent. Please email sales@designateddrinks.ca."
+                );
+              }
+            });
+          }
         } catch (error) {
           console.error("Wholesale submission error:", error);
-          setStatus("error", error.message || "The order could not be submitted. Check the Orders sheet before trying again.");
+
+          setStatus(
+            "error",
+            "The order could not be sent. Please try again or email sales@designateddrinks.ca."
+          );
+
           window.scrollTo({ top: 0, behavior: "smooth" });
         } finally {
           setSubmitting(false);
