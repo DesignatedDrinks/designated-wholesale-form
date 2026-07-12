@@ -2,11 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <title>Designated Drinks Wholesale Order Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
-    body { font-family: 'Montserrat', sans-serif; margin: 0; padding: 0; background: #f2f5f9; color: #333; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Montserrat", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f2f5f9;
+      color: #333;
+    }
+
     header {
       background: white;
       position: sticky;
@@ -16,339 +37,1282 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
-    header h1 { margin: 0; font-size: 28px; color: #001f3f; }
-    .submit-top { display: flex; align-items: center; gap: 12px; }
+
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #001f3f;
+    }
+
+    .submit-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .submit-top button {
-      background: #001f3f; color: white;
-      padding: 10px 20px; font-size: 16px;
-      border: none; border-radius: 6px; cursor: pointer;
+      background: #001f3f;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
     }
-    .submit-top button:hover { background: #003366; }
-    .order-total-header { font-size: 16px; font-weight: bold; color: #001f3f; }
+
+    .submit-top button:hover {
+      background: #003366;
+    }
+
+    .submit-top button:disabled,
+    .form-actions button:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    .order-total-header {
+      font-size: 16px;
+      font-weight: bold;
+      color: #001f3f;
+    }
 
     main {
-      max-width: 1100px; margin: auto; padding: 20px;
-      display: grid; grid-template-columns: 1fr 320px; gap: 20px;
+      max-width: 1100px;
+      margin: auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 20px;
       align-items: start;
     }
-    .buyer-info, .form-actions {
-      background: white; border-radius: 12px; padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08); margin-bottom: 20px;
+
+    .buyer-info,
+    .form-actions {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
     }
-    .buyer-info label { display: block; margin-bottom: 6px; font-weight: 600; }
+
+    .buyer-info label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
     .buyer-info input {
-      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px;
-      margin-bottom: 15px; font-size: 16px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    .buyer-info input:focus {
+      outline: 2px solid #001f3f;
+      outline-offset: 1px;
     }
 
     .vendor-header {
-      font-size: 20px; font-weight: bold; color: #001f3f;
-      padding: 12px; background: #f9fafb; border: 1px solid #cbd5e1;
-      border-radius: 8px; cursor: pointer; margin-top: 20px; user-select: none;
+      font-size: 20px;
+      font-weight: bold;
+      color: #001f3f;
+      padding: 12px;
+      background: #f9fafb;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+      user-select: none;
     }
+
     .vendor-products {
-      display: none; flex-wrap: wrap; justify-content: center; gap: 16px; margin-top: 10px;
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
     }
+
     .product-row {
-      flex: 0 1 calc(50% - 16px); max-width: 300px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      padding: 12px; background: white; border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+      flex: 0 1 calc(50% - 16px);
+      max-width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
     }
-    .product-row img { width: 80px; height: 80px; object-fit: contain; }
-    .product-details { text-align: center; }
-    .product-title { font-weight: 600; font-size: 18px; margin-bottom: 4px; }
-    .can-size { font-size: 14px; color: #555; }
-    .wholesale-price { font-size: 14px; color: #777; margin-top: 4px; }
-    .qty-inputs { width: 100%; display: flex; flex-direction: column; gap: 6px; }
-    .qty-control { display: flex; align-items: center; gap: 6px; }
+
+    .product-row img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .product-details {
+      text-align: center;
+    }
+
+    .product-title {
+      font-weight: 600;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .can-size {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .wholesale-price {
+      font-size: 14px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .qty-inputs {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .qty-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .qty-control button {
-      width: 32px; height: 32px; background: #e2e8f0; border: none; border-radius: 4px;
-      font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: #e2e8f0;
+      border: none;
+      border-radius: 4px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    .qty-control button:hover {
+      background: #cbd5e1;
+    }
+
     .qty-control input {
-      flex: 1; text-align: center; padding: 8px; font-size: 16px;
-      border: 1px solid #ccc; border-radius: 4px; -moz-appearance: textfield;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      -moz-appearance: textfield;
     }
+
     .qty-control input::-webkit-outer-spin-button,
-    .qty-control input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .qty-control input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
     .form-actions button {
-      background: #001f3f; color: white; padding: 14px 30px; font-size: 18px;
-      border: none; border-radius: 8px; cursor: pointer;
+      background: #001f3f;
+      color: white;
+      padding: 14px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    .form-actions button:hover { background: #003366; }
 
-    /* Order Summary */
+    .form-actions button:hover {
+      background: #003366;
+    }
+
     #orderSummary {
-      position: sticky; top: 92px;
-      background: white; border-radius: 12px; padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      max-height: calc(100vh - 120px); overflow: auto;
+      position: sticky;
+      top: 92px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      max-height: calc(100vh - 120px);
+      overflow: auto;
     }
-    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .summary-title { font-weight: 700; color: #001f3f; font-size: 18px; }
-    .summary-clear { background: #e2e8f0; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
-    .summary-items { display: flex; flex-direction: column; gap: 10px; margin: 10px 0; }
-    .summary-empty { color: #667; font-size: 14px; }
-    .summary-item {
-      display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center;
-      padding-bottom: 10px; border-bottom: 1px dashed #e5e7eb;
-    }
-    .summary-item-title { font-weight: 600; font-size: 14px; }
-    .summary-item-meta { font-size: 12px; color: #555; }
-    .summary-item-price { font-weight: 600; }
-    .summary-remove { grid-column: 1 / -1; background: transparent; border: none; color: #b91c1c; cursor: pointer; font-size: 12px; padding: 0; }
-    .summary-totals { border-top: 1px solid #e5e7eb; padding-top: 10px; display: grid; gap: 6px; }
-    .totals-row { display: flex; justify-content: space-between; font-size: 14px; }
-    .totals-grand { font-weight: 700; color: #001f3f; font-size: 16px; }
 
-    @media (max-width: 600px) {
-      header { flex-direction: column; text-align: center; gap: 10px; }
-      .submit-top { flex-direction: column; }
-      main { grid-template-columns: 1fr; }
-      #orderSummary { position: static; max-height: none; }
-      .vendor-products { flex-direction: column; }
-      .product-row { flex: 1 1 100%; max-width: none; }
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .summary-title {
+      font-weight: 700;
+      color: #001f3f;
+      font-size: 18px;
+    }
+
+    .summary-clear {
+      background: #e2e8f0;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .summary-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .summary-empty {
+      color: #667;
+      font-size: 14px;
+    }
+
+    .summary-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .summary-item-title {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .summary-item-meta {
+      font-size: 12px;
+      color: #555;
+    }
+
+    .summary-item-price {
+      font-weight: 600;
+    }
+
+    .summary-remove {
+      grid-column: 1 / -1;
+      background: transparent;
+      border: none;
+      color: #b91c1c;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+    }
+
+    .summary-totals {
+      border-top: 1px solid #e5e7eb;
+      padding-top: 10px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+    }
+
+    .totals-grand {
+      font-weight: 700;
+      color: #001f3f;
+      font-size: 16px;
+    }
+
+    #loader-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1999;
+      background: rgba(255, 255, 255, 0.72);
     }
 
     #loader {
-      display: none; position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%); border: 8px solid #f3f3f3; border-top: 8px solid #001f3f;
-      border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; z-index: 2000;
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #001f3f;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      z-index: 2000;
     }
-    @keyframes spin { 0% { transform: translate(-50%, -50%) rotate(0deg); } 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+
+    @keyframes spin {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+
+      .submit-top {
+        flex-direction: column;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      #orderSummary {
+        position: static;
+        max-height: none;
+      }
+
+      .vendor-products {
+        flex-direction: column;
+      }
+
+      .product-row {
+        flex: 1 1 100%;
+        max-width: none;
+      }
+
+      .form-actions button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
+
 <body>
+  <div id="loader-overlay"></div>
   <div id="loader"></div>
+
+  <iframe
+    id="wholesaleSubmitFrame"
+    name="wholesaleSubmitFrame"
+    title="Wholesale order submission"
+    style="display: none;"
+  ></iframe>
 
   <form id="wholesaleForm">
     <header>
       <h1>Wholesale Order Form</h1>
+
       <div class="submit-top">
-        <button type="submit">Submit Order</button>
-        <span class="order-total-header">Total: $0.00</span>
+        <button type="submit">
+          Submit Order
+        </button>
+
+        <span class="order-total-header">
+          Total: $0.00
+        </span>
       </div>
     </header>
 
     <main>
       <section>
         <div class="buyer-info">
-          <label for="name">Full Name</label>
-          <input id="name" name="fullName" type="text" required>
-          <label for="company">Company Name</label>
-          <input id="company" name="companyName" type="text" required>
-          <label for="email">Email Address</label>
-          <input id="email" name="email" type="email" required>
+          <label for="name">
+            Full Name
+          </label>
+
+          <input
+            id="name"
+            name="fullName"
+            type="text"
+            autocomplete="name"
+            maxlength="120"
+            required
+          >
+
+          <label for="company">
+            Company Name
+          </label>
+
+          <input
+            id="company"
+            name="companyName"
+            type="text"
+            autocomplete="organization"
+            maxlength="160"
+            required
+          >
+
+          <label for="email">
+            Email Address
+          </label>
+
+          <input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            maxlength="200"
+            required
+          >
         </div>
 
         <div id="productList"></div>
 
         <div class="form-actions">
-          <button type="submit">Submit Order</button>
+          <button type="submit">
+            Submit Order
+          </button>
         </div>
       </section>
 
-      <aside id="orderSummary" aria-live="polite">
+      <aside
+        id="orderSummary"
+        aria-live="polite"
+      >
         <div class="summary-header">
-          <div class="summary-title">Order Summary</div>
-          <button type="button" class="summary-clear" id="clearAllBtn">Clear all</button>
+          <div class="summary-title">
+            Order Summary
+          </div>
+
+          <button
+            type="button"
+            class="summary-clear"
+            id="clearAllBtn"
+          >
+            Clear all
+          </button>
         </div>
-        <div class="summary-items" id="summaryItems">
-          <div class="summary-empty">No items selected yet.</div>
+
+        <div
+          class="summary-items"
+          id="summaryItems"
+        >
+          <div class="summary-empty">
+            No items selected yet.
+          </div>
         </div>
+
         <div class="summary-totals">
-          <div class="totals-row"><span>Total cases</span><span id="totalCases">0</span></div>
-          <div class="totals-row totals-grand"><span>Grand total</span><span id="grandTotal">$0.00</span></div>
+          <div class="totals-row">
+            <span>Total cases</span>
+            <span id="totalCases">0</span>
+          </div>
+
+          <div class="totals-row totals-grand">
+            <span>Grand total</span>
+            <span id="grandTotal">$0.00</span>
+          </div>
         </div>
       </aside>
     </main>
   </form>
 
   <script>
-  (async () => {
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv';
-    const text = await fetch(sheetUrl).then(r => r.text());
-    const rows = text.trim().split('\n').slice(1).map(r => r.split(','));
-    const grouped = {};
+    (async function initializeWholesaleForm() {
+      "use strict";
 
-    rows.forEach(([title, canSize, , , imageUrl, casePrice, status]) => {
-      if (!title || (status || '').trim().toLowerCase() !== 'yes') return;
-      const vendorMatch = title.match(/^(.+?)\s\(/);
-      const vendor = vendorMatch ? vendorMatch[1] : 'Other';
-      const cleanTitle = title
-        .replace(new RegExp('^' + vendor + '\\s*', 'i'), '')
-        .replace(/\(Non-Alcoholic\)/i, '')
-        .trim();
-      if (!grouped[vendor]) grouped[vendor] = [];
-      grouped[vendor].push({
-        title: cleanTitle,
-        canSize,
-        casePrice: parseFloat(casePrice) || 0,
-        imageUrl
-      });
-    });
+      const sheetUrl =
+        "https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv";
 
-    const list = document.getElementById('productList');
-    Object.keys(grouped).sort().forEach(vendor => {
-      const hdr = document.createElement('div');
-      hdr.className = 'vendor-header';
-      hdr.textContent = vendor + ' ▼';
-      const cont = document.createElement('div');
-      cont.className = 'vendor-products';
-      cont.style.display = 'none';
-      hdr.onclick = () => {
-        cont.style.display = cont.style.display === 'flex' ? 'none' : 'flex';
-      };
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec";
 
-      grouped[vendor].forEach(p => {
-        const row = document.createElement('div');
-        row.className = 'product-row';
-        row.dataset.itemTitle = vendor + ' – ' + p.title;
-        row.dataset.vendor = vendor;
-        row.innerHTML = `
-          <img src="${p.imageUrl}" alt="${p.title}">
-          <div class="product-details">
-            <div class="product-title">${p.title}</div>
-            <div class="can-size">${p.canSize}</div>
-            <div class="wholesale-price">24-Pack Price: $${p.casePrice.toFixed(2)}</div>
-          </div>
-          <div class="qty-inputs">
-            <label>Cases</label>
-            <div class="qty-control">
-              <button type="button" class="qty-btn decrement">−</button>
-              <input type="number" min="0" value="0" data-price="${p.casePrice}">
-              <button type="button" class="qty-btn increment">+</button>
-            </div>
-          </div>
-        `;
-        cont.appendChild(row);
-      });
+      const form = document.getElementById("wholesaleForm");
+      const productList = document.getElementById("productList");
+      const summaryItemsEl = document.getElementById("summaryItems");
+      const totalCasesEl = document.getElementById("totalCases");
+      const grandTotalEl = document.getElementById("grandTotal");
+      const clearAllBtn = document.getElementById("clearAllBtn");
+      const loader = document.getElementById("loader");
+      const loaderOverlay = document.getElementById("loader-overlay");
+      const submitFrame = document.getElementById(
+        "wholesaleSubmitFrame"
+      );
 
-      list.appendChild(hdr);
-      list.appendChild(cont);
-    });
+      const submitButtons = form.querySelectorAll(
+        'button[type="submit"]'
+      );
 
-    const summaryItemsEl = document.getElementById('summaryItems');
-    const totalCasesEl   = document.getElementById('totalCases');
-    const grandTotalEl   = document.getElementById('grandTotal');
+      let submissionInProgress = false;
+      let submissionTimeout = null;
+      let temporaryPostForm = null;
 
-    function renderSummary() {
-      const items = [];
-      document.querySelectorAll('.product-row').forEach(row => {
-        const input = row.querySelector('.qty-control input');
-        const qty = parseInt(input.value) || 0;
-        if (qty > 0) {
-          const title = row.dataset.itemTitle;
-          const price = parseFloat(input.dataset.price);
-          const vendor = row.dataset.vendor || '';
-          items.push({ row, title, vendor, qty, price, subtotal: qty * price });
+      function escapeHtml(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function parseCsvRow(row) {
+        const cells = [];
+        let currentCell = "";
+        let insideQuotes = false;
+
+        for (let index = 0; index < row.length; index += 1) {
+          const character = row[index];
+          const nextCharacter = row[index + 1];
+
+          if (character === '"' && insideQuotes && nextCharacter === '"') {
+            currentCell += '"';
+            index += 1;
+            continue;
+          }
+
+          if (character === '"') {
+            insideQuotes = !insideQuotes;
+            continue;
+          }
+
+          if (character === "," && !insideQuotes) {
+            cells.push(currentCell);
+            currentCell = "";
+            continue;
+          }
+
+          currentCell += character;
         }
-      });
 
-      summaryItemsEl.innerHTML = '';
-      if (items.length === 0) {
-        summaryItemsEl.innerHTML = '<div class="summary-empty">No items selected yet.</div>';
-      } else {
-        items.forEach(({ row, title, vendor, qty, price, subtotal }) => {
-          const itemEl = document.createElement('div');
-          itemEl.className = 'summary-item';
-          itemEl.innerHTML = `
-            <div>
-              <div class="summary-item-title">${title}</div>
-              <div class="summary-item-meta">${vendor} • $${price.toFixed(2)}/case</div>
-              <button type="button" class="summary-remove">Remove</button>
-            </div>
-            <div style="text-align:right">
-              <div>${qty}×</div>
-              <div class="summary-item-price">$${subtotal.toFixed(2)}</div>
-            </div>
-          `;
-          itemEl.querySelector('.summary-remove').addEventListener('click', () => {
-            const input = row.querySelector('.qty-control input');
-            input.value = 0;
-            updateTotals();
+        cells.push(currentCell);
+
+        return cells;
+      }
+
+      function splitCsvRows(csvText) {
+        const rows = [];
+        let currentRow = "";
+        let insideQuotes = false;
+
+        for (let index = 0; index < csvText.length; index += 1) {
+          const character = csvText[index];
+          const nextCharacter = csvText[index + 1];
+
+          if (character === '"' && insideQuotes && nextCharacter === '"') {
+            currentRow += '""';
+            index += 1;
+            continue;
+          }
+
+          if (character === '"') {
+            insideQuotes = !insideQuotes;
+            currentRow += character;
+            continue;
+          }
+
+          if (
+            (character === "\n" || character === "\r") &&
+            !insideQuotes
+          ) {
+            if (
+              character === "\r" &&
+              nextCharacter === "\n"
+            ) {
+              index += 1;
+            }
+
+            if (currentRow.trim()) {
+              rows.push(currentRow);
+            }
+
+            currentRow = "";
+            continue;
+          }
+
+          currentRow += character;
+        }
+
+        if (currentRow.trim()) {
+          rows.push(currentRow);
+        }
+
+        return rows;
+      }
+
+      async function loadProducts() {
+        const response = await fetch(sheetUrl, {
+          method: "GET",
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            "The wholesale product list could not be loaded."
+          );
+        }
+
+        const csvText = await response.text();
+
+        const rows = splitCsvRows(csvText)
+          .slice(1)
+          .map(parseCsvRow);
+
+        const grouped = {};
+
+        rows.forEach(row => {
+          const title = String(row[0] || "").trim();
+          const canSize = String(row[1] || "").trim();
+          const imageUrl = String(row[4] || "").trim();
+          const casePrice = parseFloat(row[5]) || 0;
+          const status = String(row[6] || "")
+            .trim()
+            .toLowerCase();
+
+          if (!title || status !== "yes") {
+            return;
+          }
+
+          const vendorMatch = title.match(/^(.+?)\s\(/);
+          const vendor = vendorMatch
+            ? vendorMatch[1].trim()
+            : "Other";
+
+          const cleanTitle = title
+            .replace(
+              new RegExp(
+                "^" +
+                vendor.replace(
+                  /[.*+?^${}()|[\]\\]/g,
+                  "\\$&"
+                ) +
+                "\\s*",
+                "i"
+              ),
+              ""
+            )
+            .replace(/\(Non-Alcoholic\)/i, "")
+            .trim();
+
+          if (!grouped[vendor]) {
+            grouped[vendor] = [];
+          }
+
+          grouped[vendor].push({
+            title: cleanTitle,
+            canSize,
+            casePrice,
+            imageUrl
           });
-          summaryItemsEl.appendChild(itemEl);
+        });
+
+        renderProducts(grouped);
+      }
+
+      function renderProducts(grouped) {
+        productList.innerHTML = "";
+
+        const vendorNames = Object.keys(grouped).sort(
+          (first, second) =>
+            first.localeCompare(second)
+        );
+
+        if (vendorNames.length === 0) {
+          productList.innerHTML =
+            '<div class="buyer-info">No wholesale products are currently available.</div>';
+
+          return;
+        }
+
+        vendorNames.forEach(vendor => {
+          const vendorHeader =
+            document.createElement("div");
+
+          vendorHeader.className = "vendor-header";
+          vendorHeader.setAttribute("role", "button");
+          vendorHeader.setAttribute("tabindex", "0");
+          vendorHeader.setAttribute("aria-expanded", "false");
+          vendorHeader.textContent = vendor + " ▼";
+
+          const vendorProducts =
+            document.createElement("div");
+
+          vendorProducts.className = "vendor-products";
+          vendorProducts.style.display = "none";
+
+          function toggleVendor() {
+            const isOpen =
+              vendorProducts.style.display === "flex";
+
+            vendorProducts.style.display =
+              isOpen ? "none" : "flex";
+
+            vendorHeader.textContent =
+              vendor + (isOpen ? " ▼" : " ▲");
+
+            vendorHeader.setAttribute(
+              "aria-expanded",
+              String(!isOpen)
+            );
+          }
+
+          vendorHeader.addEventListener(
+            "click",
+            toggleVendor
+          );
+
+          vendorHeader.addEventListener(
+            "keydown",
+            event => {
+              if (
+                event.key === "Enter" ||
+                event.key === " "
+              ) {
+                event.preventDefault();
+                toggleVendor();
+              }
+            }
+          );
+
+          grouped[vendor].forEach(product => {
+            const productRow =
+              document.createElement("div");
+
+            productRow.className = "product-row";
+
+            productRow.dataset.itemTitle =
+              vendor + " – " + product.title;
+
+            productRow.dataset.vendor = vendor;
+
+            const safeTitle = escapeHtml(product.title);
+            const safeCanSize = escapeHtml(product.canSize);
+            const safeImageUrl = escapeHtml(product.imageUrl);
+            const safeVendor = escapeHtml(vendor);
+
+            productRow.innerHTML = `
+              <img
+                src="${safeImageUrl}"
+                alt="${safeTitle}"
+                loading="lazy"
+              >
+
+              <div class="product-details">
+                <div class="product-title">
+                  ${safeTitle}
+                </div>
+
+                <div class="can-size">
+                  ${safeCanSize}
+                </div>
+
+                <div class="wholesale-price">
+                  24-Pack Price:
+                  $${product.casePrice.toFixed(2)}
+                </div>
+              </div>
+
+              <div class="qty-inputs">
+                <label>
+                  Cases
+                </label>
+
+                <div class="qty-control">
+                  <button
+                    type="button"
+                    class="qty-btn decrement"
+                    aria-label="Remove one case of ${safeVendor} ${safeTitle}"
+                  >
+                    −
+                  </button>
+
+                  <input
+                    type="number"
+                    min="0"
+                    max="999"
+                    step="1"
+                    inputmode="numeric"
+                    value="0"
+                    data-price="${product.casePrice}"
+                    aria-label="Cases of ${safeVendor} ${safeTitle}"
+                  >
+
+                  <button
+                    type="button"
+                    class="qty-btn increment"
+                    aria-label="Add one case of ${safeVendor} ${safeTitle}"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            `;
+
+            vendorProducts.appendChild(productRow);
+          });
+
+          productList.appendChild(vendorHeader);
+          productList.appendChild(vendorProducts);
+        });
+
+        updateTotals();
+      }
+
+      function getSelectedItems() {
+        const items = [];
+
+        document
+          .querySelectorAll(".product-row")
+          .forEach(row => {
+            const input = row.querySelector(
+              ".qty-control input"
+            );
+
+            const quantity =
+              parseInt(input.value, 10) || 0;
+
+            if (quantity <= 0) {
+              return;
+            }
+
+            const title = row.dataset.itemTitle;
+            const vendor = row.dataset.vendor || "";
+            const price =
+              parseFloat(input.dataset.price) || 0;
+
+            items.push({
+              row,
+              title,
+              vendor,
+              quantity,
+              price,
+              subtotal: quantity * price
+            });
+          });
+
+        return items;
+      }
+
+      function renderSummary() {
+        const items = getSelectedItems();
+
+        summaryItemsEl.innerHTML = "";
+
+        if (items.length === 0) {
+          summaryItemsEl.innerHTML =
+            '<div class="summary-empty">No items selected yet.</div>';
+        } else {
+          items.forEach(item => {
+            const itemEl =
+              document.createElement("div");
+
+            itemEl.className = "summary-item";
+
+            itemEl.innerHTML = `
+              <div>
+                <div class="summary-item-title">
+                  ${escapeHtml(item.title)}
+                </div>
+
+                <div class="summary-item-meta">
+                  ${escapeHtml(item.vendor)}
+                  •
+                  $${item.price.toFixed(2)}/case
+                </div>
+
+                <button
+                  type="button"
+                  class="summary-remove"
+                >
+                  Remove
+                </button>
+              </div>
+
+              <div style="text-align: right;">
+                <div>
+                  ${item.quantity}×
+                </div>
+
+                <div class="summary-item-price">
+                  $${item.subtotal.toFixed(2)}
+                </div>
+              </div>
+            `;
+
+            itemEl
+              .querySelector(".summary-remove")
+              .addEventListener("click", () => {
+                const input = item.row.querySelector(
+                  ".qty-control input"
+                );
+
+                input.value = 0;
+                updateTotals();
+              });
+
+            summaryItemsEl.appendChild(itemEl);
+          });
+        }
+
+        const totalCases = items.reduce(
+          (total, item) =>
+            total + item.quantity,
+          0
+        );
+
+        const totalAmount = items.reduce(
+          (total, item) =>
+            total + item.subtotal,
+          0
+        );
+
+        totalCasesEl.textContent =
+          String(totalCases);
+
+        grandTotalEl.textContent =
+          "$" + totalAmount.toFixed(2);
+
+        document
+          .querySelectorAll(".order-total-header")
+          .forEach(element => {
+            element.textContent =
+              "Total: $" + totalAmount.toFixed(2);
+          });
+      }
+
+      function updateTotals() {
+        renderSummary();
+      }
+
+      function sanitizeQuantityInput(input) {
+        let value = parseInt(input.value, 10);
+
+        if (!Number.isFinite(value) || value < 0) {
+          value = 0;
+        }
+
+        if (value > 999) {
+          value = 999;
+        }
+
+        input.value = value;
+      }
+
+      productList.addEventListener(
+        "input",
+        event => {
+          if (
+            event.target.matches(
+              ".qty-control input"
+            )
+          ) {
+            sanitizeQuantityInput(event.target);
+            updateTotals();
+          }
+        }
+      );
+
+      productList.addEventListener(
+        "click",
+        event => {
+          const button = event.target.closest(
+            ".increment, .decrement"
+          );
+
+          if (!button) {
+            return;
+          }
+
+          const input = button
+            .closest(".qty-control")
+            .querySelector("input");
+
+          let value =
+            parseInt(input.value, 10) || 0;
+
+          if (
+            button.classList.contains("increment")
+          ) {
+            value += 1;
+          } else {
+            value -= 1;
+          }
+
+          input.value =
+            Math.min(999, Math.max(0, value));
+
+          updateTotals();
+        }
+      );
+
+      clearAllBtn.addEventListener(
+        "click",
+        () => {
+          document
+            .querySelectorAll(
+              ".qty-control input"
+            )
+            .forEach(input => {
+              input.value = 0;
+            });
+
+          updateTotals();
+        }
+      );
+
+      function setSubmitting(isSubmitting) {
+        submissionInProgress = isSubmitting;
+
+        loader.style.display =
+          isSubmitting ? "block" : "none";
+
+        loaderOverlay.style.display =
+          isSubmitting ? "block" : "none";
+
+        submitButtons.forEach(button => {
+          button.disabled = isSubmitting;
+
+          button.textContent =
+            isSubmitting
+              ? "Submitting…"
+              : "Submit Order";
         });
       }
 
-      const totalCases = items.reduce((a, b) => a + b.qty, 0);
-      const totalAmount = items.reduce((a, b) => a + b.subtotal, 0);
-      totalCasesEl.textContent = totalCases;
-      grandTotalEl.textContent = `$${totalAmount.toFixed(2)}`;
+      function cleanupSubmission() {
+        if (submissionTimeout) {
+          window.clearTimeout(
+            submissionTimeout
+          );
 
-      document.querySelectorAll('.order-total-header').forEach(el => {
-        el.textContent = `Total: $${totalAmount.toFixed(2)}`;
-      });
-    }
-
-    function updateTotals() { renderSummary(); }
-
-    document.getElementById('productList').addEventListener('input', updateTotals);
-    document.addEventListener('click', e => {
-      if (e.target.classList.contains('increment') || e.target.classList.contains('decrement')) {
-        const input = e.target.closest('.qty-control').querySelector('input');
-        let val = parseInt(input.value) || 0;
-        val += e.target.classList.contains('increment') ? 1 : -1;
-        input.value = val < 0 ? 0 : val;
-        updateTotals();
-      }
-    });
-
-    document.getElementById('clearAllBtn').addEventListener('click', () => {
-      document.querySelectorAll('.qty-control input').forEach(i => i.value = 0);
-      updateTotals();
-    });
-
-    updateTotals();
-
-    const form = document.getElementById('wholesaleForm'),
-          loader = document.getElementById('loader'),
-          scriptURL = 'https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec';
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      loader.style.display = 'block';
-      updateTotals();
-
-      const params = new URLSearchParams();
-      ['fullName','companyName','email'].forEach(k => {
-        params.append(k, form[k].value.trim());
-      });
-
-      let idx = 0;
-      document.querySelectorAll('.product-row').forEach(row => {
-        const cnt = parseInt(row.querySelector('.qty-control input').value) || 0;
-        if (cnt) {
-          params.append(`item_${idx}_title`, row.dataset.itemTitle);
-          params.append(`item_${idx}_cases`, cnt);
-          idx++;
+          submissionTimeout = null;
         }
-      });
+
+        if (temporaryPostForm) {
+          temporaryPostForm.remove();
+          temporaryPostForm = null;
+        }
+
+        setSubmitting(false);
+      }
+
+      function createSubmissionId() {
+        if (
+          window.crypto &&
+          typeof window.crypto.randomUUID ===
+            "function"
+        ) {
+          return window.crypto.randomUUID();
+        }
+
+        return (
+          Date.now() +
+          "-" +
+          Math.random()
+            .toString(36)
+            .slice(2)
+        );
+      }
+
+      window.addEventListener(
+        "message",
+        event => {
+          if (
+            event.source !==
+            submitFrame.contentWindow
+          ) {
+            return;
+          }
+
+          const result = event.data;
+
+          if (
+            !result ||
+            result.source !== "dd-wholesale"
+          ) {
+            return;
+          }
+
+          cleanupSubmission();
+
+          if (result.status === "success") {
+            const reference = result.orderId
+              ? " Reference: " +
+                result.orderId +
+                "."
+              : "";
+
+            window.alert(
+              "✅ Order submitted!" +
+              reference +
+              " A rep will contact you shortly."
+            );
+
+            form.reset();
+            updateTotals();
+
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth"
+            });
+
+            return;
+          }
+
+          const message =
+            result.message ||
+            "The order could not be submitted.";
+
+          window.alert(
+            "⚠️ " +
+            message +
+            " Please try again or email sales@designateddrinks.ca."
+          );
+        }
+      );
+
+      form.addEventListener(
+        "submit",
+        event => {
+          event.preventDefault();
+
+          if (submissionInProgress) {
+            return;
+          }
+
+          if (!form.reportValidity()) {
+            return;
+          }
+
+          updateTotals();
+
+          const selectedItems =
+            getSelectedItems();
+
+          if (selectedItems.length === 0) {
+            window.alert(
+              "Please select at least one product before submitting the order."
+            );
+
+            return;
+          }
+
+          const params =
+            new URLSearchParams();
+
+          params.append(
+            "fullName",
+            form.elements.fullName.value.trim()
+          );
+
+          params.append(
+            "companyName",
+            form.elements.companyName.value.trim()
+          );
+
+          params.append(
+            "email",
+            form.elements.email.value.trim()
+          );
+
+          params.append(
+            "submissionId",
+            createSubmissionId()
+          );
+
+          params.append(
+            "website",
+            ""
+          );
+
+          selectedItems.forEach(
+            (item, index) => {
+              params.append(
+                "item_" + index + "_title",
+                item.title
+              );
+
+              params.append(
+                "item_" + index + "_cases",
+                String(item.quantity)
+              );
+            }
+          );
+
+          temporaryPostForm =
+            document.createElement("form");
+
+          temporaryPostForm.method = "POST";
+          temporaryPostForm.action = scriptURL;
+          temporaryPostForm.target =
+            "wholesaleSubmitFrame";
+
+          temporaryPostForm.style.display =
+            "none";
+
+          params.forEach(
+            (value, key) => {
+              const hiddenInput =
+                document.createElement("input");
+
+              hiddenInput.type = "hidden";
+              hiddenInput.name = key;
+              hiddenInput.value = value;
+
+              temporaryPostForm.appendChild(
+                hiddenInput
+              );
+            }
+          );
+
+          document.body.appendChild(
+            temporaryPostForm
+          );
+
+          setSubmitting(true);
+
+          temporaryPostForm.submit();
+
+          submissionTimeout =
+            window.setTimeout(() => {
+              cleanupSubmission();
+
+              window.alert(
+                "⚠️ The order service did not respond. Please try again or email sales@designateddrinks.ca."
+              );
+            }, 30000);
+        }
+      );
 
       try {
-        const resp = await fetch(scriptURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: params.toString()
-        });
-        if (!resp.ok) throw new Error('Network response not ok');
-        alert('✅ Order submitted! A rep will contact you shortly.');
-        form.reset();
-        updateTotals();
-        window.scrollTo(0,0);
-      } catch (err) {
-        console.error(err);
-        alert('⚠️ Error submitting order. Please try again.');
-      } finally {
-        loader.style.display = 'none';
+        await loadProducts();
+      } catch (error) {
+        console.error(
+          "Wholesale product loading error:",
+          error
+        );
+
+        productList.innerHTML = `
+          <div class="buyer-info">
+            <strong>
+              The wholesale product list could not be loaded.
+            </strong>
+
+            <p>
+              Please refresh the page or contact
+              sales@designateddrinks.ca.
+            </p>
+          </div>
+        `;
       }
-    });
-  })();
+    })();
   </script>
 </body>
 </html>
