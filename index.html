@@ -509,10 +509,10 @@
         "https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv";
 
       const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbyxB0rJS1p9NOX3GaHuOae88yJeZfbdtJ8uy54mOMylEkLnkUCh_WB_QqAuXaKj2Hc1Ag/exec";
+        "https://script.google.com/macros/s/AKfycbzB69xjVcQXBRvhSdCGuZJ0RClHjV-iFWVh4dMvvfTpLd6i9ZP3SA7k87EA2MxdI3QkcQ/exec";
 
       const HST_RATE = 0.13;
-      const STATUS_TIMEOUT_MS = 45000;
+      const STATUS_TIMEOUT_MS = 60000;
       const STATUS_POLL_MS = 1000;
 
       const form = document.getElementById("wholesaleForm");
@@ -906,7 +906,7 @@
           await new Promise(resolve => window.setTimeout(resolve, STATUS_POLL_MS));
         }
 
-        throw new Error("The order service did not confirm the submission. Check the Orders sheet before trying again.");
+        throw new Error("The order may have been received, but the confirmation could not be loaded. Check your email or the Orders sheet before submitting it again.");
       }
 
       productList.addEventListener("click", event => {
@@ -984,14 +984,35 @@
         setStatus("working", "Submitting your order and confirming the totals…");
 
         try {
-          const postPromise = fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            body: params
-          }).catch(() => null);
+          /*
+           * Wait for the POST request to finish before starting the
+           * confirmation countdown. Apps Script may need time to write
+           * the order and send email, and the old version started the
+           * countdown too early.
+           */
+          let postError = null;
+
+          try {
+            await fetch(SCRIPT_URL, {
+              method: "POST",
+              mode: "no-cors",
+              body: params
+            });
+          } catch (error) {
+            /*
+             * A cross-origin browser error does not always mean the POST
+             * failed. Continue to the status check because Apps Script may
+             * still have received and saved the order.
+             */
+            postError = error;
+            console.warn("Wholesale POST response could not be read:", error);
+          }
 
           const result = await waitForSubmission(submissionId);
-          await postPromise;
+
+          if (!result || result.status !== "success") {
+            throw postError || new Error("The order could not be confirmed.");
+          }
 
           const confirmedTotal = Number(result.total);
           const totalText = Number.isFinite(confirmedTotal) ? money(confirmedTotal) : money(totals.total);
