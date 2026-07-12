@@ -2,557 +2,546 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Designated Drinks Wholesale Order Form</title>
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
-    rel="stylesheet"
-  >
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+
+    :root {
+      --navy: #001f3f;
+      --navy-hover: #003366;
+      --background: #f2f5f9;
+      --surface: #ffffff;
+      --border: #d8e0e8;
+      --muted: #667085;
+      --danger: #b42318;
+      --success: #067647;
+      --warning: #b54708;
     }
 
     body {
-      font-family: "Montserrat", sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f2f5f9;
-      color: #333;
+      background: var(--background);
+      color: #25313c;
+      font-family: "Montserrat", sans-serif;
     }
 
+    button,
+    input { font: inherit; }
+
+    button { touch-action: manipulation; }
+
     header {
-      background: white;
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      gap: 20px;
+      padding: 18px 22px;
+      background: var(--surface);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
 
     header h1 {
       margin: 0;
-      font-size: 28px;
-      color: #001f3f;
+      color: var(--navy);
+      font-size: clamp(22px, 3vw, 30px);
     }
 
     .submit-top {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      white-space: nowrap;
     }
 
-    .submit-top button {
-      background: #001f3f;
+    .primary-button {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 20px;
+      background: var(--navy);
       color: white;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
       cursor: pointer;
+      font-weight: 700;
     }
 
-    .submit-top button:hover {
-      background: #003366;
-    }
+    .primary-button:hover:not(:disabled) { background: var(--navy-hover); }
 
-    .submit-top button:disabled,
-    .form-actions button:disabled {
+    .primary-button:disabled {
       cursor: not-allowed;
-      opacity: 0.65;
+      opacity: 0.58;
     }
 
     .order-total-header {
-      font-size: 16px;
-      font-weight: bold;
-      color: #001f3f;
+      color: var(--navy);
+      font-weight: 700;
     }
 
+    .page-shell {
+      width: min(1160px, calc(100% - 32px));
+      margin: 22px auto 40px;
+    }
+
+    #statusBanner {
+      display: none;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    #statusBanner.is-visible { display: block; }
+    #statusBanner.is-working { border-color: #fedf89; background: #fffaeb; color: var(--warning); }
+    #statusBanner.is-success { border-color: #abefc6; background: #ecfdf3; color: var(--success); }
+    #statusBanner.is-error { border-color: #fecdca; background: #fef3f2; color: var(--danger); }
+
     main {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
-      gap: 20px;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 22px;
       align-items: start;
     }
 
-    .buyer-info,
-    .form-actions {
-      background: white;
+    .card {
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      background: var(--surface);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+    }
+
+    .buyer-info,
+    .catalog-controls,
+    .form-actions {
       margin-bottom: 20px;
+      padding: 20px;
     }
 
-    .buyer-info label {
+    .buyer-info label,
+    .catalog-controls label {
       display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
+      margin-bottom: 7px;
+      font-weight: 700;
     }
 
-    .buyer-info input {
+    .buyer-info input,
+    .catalog-controls input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid #c8d1dc;
       border-radius: 8px;
-      margin-bottom: 15px;
+      padding: 11px 12px;
       font-size: 16px;
     }
 
-    .buyer-info input:focus {
-      outline: 2px solid #001f3f;
-      outline-offset: 1px;
+    .buyer-info input { margin-bottom: 16px; }
+    .buyer-info input:last-child { margin-bottom: 0; }
+
+    input:focus {
+      outline: 3px solid rgba(0, 31, 63, 0.13);
+      border-color: var(--navy);
     }
 
-    .vendor-header {
-      font-size: 20px;
-      font-weight: bold;
-      color: #001f3f;
-      padding: 12px;
-      background: #f9fafb;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 20px;
-      user-select: none;
+    .catalog-tools {
+      display: flex;
+      gap: 9px;
+      margin-top: 12px;
+      flex-wrap: wrap;
     }
+
+    .secondary-button {
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 11px;
+      background: white;
+      color: var(--navy);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .secondary-button:hover { background: #f8fafc; }
+
+    .catalog-note {
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .vendor-group { margin-top: 18px; }
+
+    .vendor-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      padding: 13px 14px;
+      background: #f9fafb;
+      color: var(--navy);
+      cursor: pointer;
+      font-size: 19px;
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .vendor-header:hover { background: #f3f6f9; }
 
     .vendor-products {
       display: none;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px;
+      margin-top: 12px;
     }
+
+    .vendor-products.is-open { display: grid; }
 
     .product-row {
-      flex: 0 1 calc(50% - 16px);
-      max-width: 300px;
       display: flex;
+      min-width: 0;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
+      gap: 11px;
+      padding: 15px;
+      border-radius: 10px;
       background: white;
-      border-radius: 8px;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
     }
 
+    .product-row[hidden],
+    .vendor-group[hidden] { display: none !important; }
+
     .product-row img {
-      width: 80px;
-      height: 80px;
+      width: 92px;
+      height: 92px;
       object-fit: contain;
     }
 
-    .product-details {
-      text-align: center;
-    }
+    .product-details { text-align: center; }
 
     .product-title {
-      font-weight: 600;
-      font-size: 18px;
-      margin-bottom: 4px;
+      color: #263746;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.3;
     }
 
-    .can-size {
-      font-size: 14px;
-      color: #555;
-    }
-
+    .can-size,
     .wholesale-price {
-      font-size: 14px;
-      color: #777;
       margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .qty-inputs {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .qty-inputs { width: 100%; }
+
+    .qty-inputs label {
+      display: block;
+      margin-bottom: 6px;
+      color: #475467;
+      font-size: 13px;
+      font-weight: 600;
     }
 
     .qty-control {
-      display: flex;
+      display: grid;
+      grid-template-columns: 36px minmax(60px, 1fr) 36px;
+      gap: 7px;
       align-items: center;
-      gap: 6px;
     }
 
     .qty-control button {
-      width: 32px;
-      height: 32px;
-      background: #e2e8f0;
-      border: none;
-      border-radius: 4px;
-      font-size: 18px;
+      height: 36px;
+      border: 0;
+      border-radius: 6px;
+      background: #e8eef4;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 20px;
+      line-height: 1;
     }
 
-    .qty-control button:hover {
-      background: #cbd5e1;
-    }
+    .qty-control button:hover { background: #d8e2ec; }
 
     .qty-control input {
-      flex: 1;
-      min-width: 0;
+      width: 100%;
+      height: 36px;
+      border: 1px solid #c8d1dc;
+      border-radius: 6px;
       text-align: center;
-      padding: 8px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
       -moz-appearance: textfield;
     }
 
     .qty-control input::-webkit-outer-spin-button,
     .qty-control input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
       margin: 0;
+      -webkit-appearance: none;
     }
 
-    .form-actions button {
-      background: #001f3f;
-      color: white;
-      padding: 14px 30px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .form-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
     }
 
-    .form-actions button:hover {
-      background: #003366;
+    .form-actions-note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
     }
 
     #orderSummary {
       position: sticky;
       top: 92px;
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-      max-height: calc(100vh - 120px);
+      max-height: calc(100vh - 118px);
       overflow: auto;
+      padding: 17px;
     }
 
     .summary-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      justify-content: space-between;
+      gap: 12px;
     }
 
     .summary-title {
+      color: var(--navy);
+      font-size: 19px;
       font-weight: 700;
-      color: #001f3f;
-      font-size: 18px;
-    }
-
-    .summary-clear {
-      background: #e2e8f0;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 10px;
-      cursor: pointer;
     }
 
     .summary-items {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin: 10px 0;
+      gap: 11px;
+      margin: 15px 0;
     }
 
     .summary-empty {
-      color: #667;
+      color: var(--muted);
       font-size: 14px;
     }
 
     .summary-item {
       display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 6px;
-      align-items: center;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed #e5e7eb;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      padding-bottom: 11px;
+      border-bottom: 1px dashed #dfe5ec;
     }
 
     .summary-item-title {
-      font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
     }
 
     .summary-item-meta {
+      margin-top: 3px;
+      color: var(--muted);
       font-size: 12px;
-      color: #555;
-    }
-
-    .summary-item-price {
-      font-weight: 600;
+      line-height: 1.35;
     }
 
     .summary-remove {
-      grid-column: 1 / -1;
+      margin-top: 5px;
+      border: 0;
+      padding: 0;
       background: transparent;
-      border: none;
-      color: #b91c1c;
+      color: var(--danger);
       cursor: pointer;
       font-size: 12px;
-      padding: 0;
+    }
+
+    .summary-item-price {
+      font-weight: 700;
+      text-align: right;
     }
 
     .summary-totals {
-      border-top: 1px solid #e5e7eb;
-      padding-top: 10px;
       display: grid;
-      gap: 6px;
+      gap: 8px;
+      padding-top: 12px;
+      border-top: 1px solid #dfe5ec;
     }
 
     .totals-row {
       display: flex;
       justify-content: space-between;
+      gap: 15px;
       font-size: 14px;
     }
 
     .totals-grand {
+      padding-top: 5px;
+      color: var(--navy);
+      font-size: 17px;
       font-weight: 700;
-      color: #001f3f;
-      font-size: 16px;
     }
 
-    #loader-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1999;
-      background: rgba(255, 255, 255, 0.72);
+    .tax-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
     }
 
-    #loader {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #001f3f;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      animation: spin 1s linear infinite;
-      z-index: 2000;
+    .loading-products {
+      padding: 22px;
+      border-radius: 10px;
+      background: white;
+      color: var(--muted);
+      text-align: center;
     }
 
-    @keyframes spin {
-      0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-      }
-
-      100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-      }
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 850px) {
       header {
+        position: static;
+        align-items: flex-start;
         flex-direction: column;
-        text-align: center;
-        gap: 10px;
       }
 
       .submit-top {
-        flex-direction: column;
+        width: 100%;
+        justify-content: space-between;
       }
 
-      main {
-        grid-template-columns: 1fr;
-      }
+      main { grid-template-columns: 1fr; }
 
       #orderSummary {
         position: static;
         max-height: none;
       }
+    }
 
-      .vendor-products {
-        flex-direction: column;
-      }
-
-      .product-row {
-        flex: 1 1 100%;
-        max-width: none;
-      }
-
-      .form-actions button {
-        width: 100%;
-      }
+    @media (max-width: 600px) {
+      .page-shell { width: min(100% - 20px, 1160px); }
+      header { padding: 15px; }
+      .vendor-products { grid-template-columns: 1fr; }
+      .form-actions { align-items: stretch; flex-direction: column; }
+      .form-actions .primary-button { width: 100%; }
+      .submit-top .primary-button { padding-inline: 14px; }
     }
   </style>
 </head>
 
 <body>
-  <div id="loader-overlay"></div>
-  <div id="loader"></div>
-
-  <iframe
-    id="wholesaleSubmitFrame"
-    name="wholesaleSubmitFrame"
-    title="Wholesale order submission"
-    style="display: none;"
-  ></iframe>
-
-  <form id="wholesaleForm">
+  <form id="wholesaleForm" novalidate>
     <header>
       <h1>Wholesale Order Form</h1>
 
       <div class="submit-top">
-        <button type="submit">
-          Submit Order
-        </button>
-
-        <span class="order-total-header">
-          Total: $0.00
-        </span>
+        <button type="submit" class="primary-button">Submit Order</button>
+        <span class="order-total-header">Total: $0.00</span>
       </div>
     </header>
 
-    <main>
-      <section>
-        <div class="buyer-info">
-          <label for="name">
-            Full Name
-          </label>
+    <div class="page-shell">
+      <div id="statusBanner" role="status" aria-live="polite"></div>
 
-          <input
-            id="name"
-            name="fullName"
-            type="text"
-            autocomplete="name"
-            maxlength="120"
-            required
-          >
+      <main>
+        <section>
+          <div class="buyer-info card">
+            <label for="name">Full Name</label>
+            <input id="name" name="fullName" type="text" autocomplete="name" maxlength="120" required>
 
-          <label for="company">
-            Company Name
-          </label>
+            <label for="company">Company Name</label>
+            <input id="company" name="companyName" type="text" autocomplete="organization" maxlength="160" required>
 
-          <input
-            id="company"
-            name="companyName"
-            type="text"
-            autocomplete="organization"
-            maxlength="160"
-            required
-          >
-
-          <label for="email">
-            Email Address
-          </label>
-
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autocomplete="email"
-            maxlength="200"
-            required
-          >
-        </div>
-
-        <div id="productList"></div>
-
-        <div class="form-actions">
-          <button type="submit">
-            Submit Order
-          </button>
-        </div>
-      </section>
-
-      <aside
-        id="orderSummary"
-        aria-live="polite"
-      >
-        <div class="summary-header">
-          <div class="summary-title">
-            Order Summary
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email" autocomplete="email" maxlength="200" required>
           </div>
 
-          <button
-            type="button"
-            class="summary-clear"
-            id="clearAllBtn"
-          >
-            Clear all
-          </button>
-        </div>
+          <div class="catalog-controls card">
+            <label for="productSearch">Find a brewery or product</label>
+            <input id="productSearch" type="search" placeholder="Start typing a brewery or product name">
 
-        <div
-          class="summary-items"
-          id="summaryItems"
-        >
-          <div class="summary-empty">
-            No items selected yet.
-          </div>
-        </div>
+            <div class="catalog-tools">
+              <button type="button" class="secondary-button" id="expandAllBtn">Expand all</button>
+              <button type="button" class="secondary-button" id="collapseAllBtn">Collapse all</button>
+            </div>
 
-        <div class="summary-totals">
-          <div class="totals-row">
-            <span>Total cases</span>
-            <span id="totalCases">0</span>
+            <p class="catalog-note">Case prices are shown before 13% HST.</p>
           </div>
 
-          <div class="totals-row totals-grand">
-            <span>Grand total</span>
-            <span id="grandTotal">$0.00</span>
+          <div id="productList">
+            <div class="loading-products">Loading wholesale products…</div>
           </div>
-        </div>
-      </aside>
-    </main>
+
+          <div class="form-actions card">
+            <div class="form-actions-note">Your order is a request. We will confirm availability, payment and delivery details.</div>
+            <button type="submit" class="primary-button">Submit Order</button>
+          </div>
+        </section>
+
+        <aside id="orderSummary" class="card" aria-live="polite">
+          <div class="summary-header">
+            <div class="summary-title">Order Summary</div>
+            <button type="button" class="secondary-button" id="clearAllBtn">Clear all</button>
+          </div>
+
+          <div class="summary-items" id="summaryItems">
+            <div class="summary-empty">No items selected yet.</div>
+          </div>
+
+          <div class="summary-totals">
+            <div class="totals-row"><span>Total cases</span><span id="totalCases">0</span></div>
+            <div class="totals-row"><span>Subtotal</span><span id="subtotalAmount">$0.00</span></div>
+            <div class="totals-row"><span>HST (13%)</span><span id="hstAmount">$0.00</span></div>
+            <div class="totals-row totals-grand"><span>Grand total</span><span id="grandTotal">$0.00</span></div>
+          </div>
+
+          <p class="tax-note">The final amount is confirmed after availability and delivery details are reviewed.</p>
+        </aside>
+      </main>
+    </div>
   </form>
 
   <script>
-    (async function initializeWholesaleForm() {
+    (function () {
       "use strict";
 
-      const sheetUrl =
+      const PRODUCT_CSV_URL =
         "https://docs.google.com/spreadsheets/d/17bcjrwi7Ah8_SXaPc9VrCIi2fdYnnNofmUoGy4LKBQ8/export?format=csv";
 
-      const scriptURL =
-        "https://script.google.com/macros/s/AKfycbz3taUxXEl7jE1f--mHDBf_IRywYxzkmkFWlc5rSiOkNQ0t8ffQfiVfeAdFoMpZe5CeuA/exec";
+      const SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycby_osnVQU58RYUp7QIxdWytG6a-e9qZE0rpKjziNsf4egckPFITo_cWTCP9HJK7vdoDTA/exec";
+
+      const HST_RATE = 0.13;
+      const STATUS_TIMEOUT_MS = 45000;
+      const STATUS_POLL_MS = 1000;
 
       const form = document.getElementById("wholesaleForm");
       const productList = document.getElementById("productList");
-      const summaryItemsEl = document.getElementById("summaryItems");
-      const totalCasesEl = document.getElementById("totalCases");
-      const grandTotalEl = document.getElementById("grandTotal");
+      const productSearch = document.getElementById("productSearch");
+      const summaryItems = document.getElementById("summaryItems");
+      const totalCases = document.getElementById("totalCases");
+      const subtotalAmount = document.getElementById("subtotalAmount");
+      const hstAmount = document.getElementById("hstAmount");
+      const grandTotal = document.getElementById("grandTotal");
       const clearAllBtn = document.getElementById("clearAllBtn");
-      const loader = document.getElementById("loader");
-      const loaderOverlay = document.getElementById("loader-overlay");
-      const submitFrame = document.getElementById(
-        "wholesaleSubmitFrame"
-      );
-
-      const submitButtons = form.querySelectorAll(
-        'button[type="submit"]'
-      );
+      const expandAllBtn = document.getElementById("expandAllBtn");
+      const collapseAllBtn = document.getElementById("collapseAllBtn");
+      const statusBanner = document.getElementById("statusBanner");
+      const submitButtons = form.querySelectorAll('button[type="submit"]');
 
       let submissionInProgress = false;
-      let submissionTimeout = null;
-      let temporaryPostForm = null;
+      let productsLoaded = false;
+
+      function money(value) {
+        return new Intl.NumberFormat("en-CA", {
+          style: "currency",
+          currency: "CAD"
+        }).format(Number(value) || 0);
+      }
+
+      function roundMoney(value) {
+        return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+      }
 
       function escapeHtml(value) {
         return String(value == null ? "" : value)
@@ -563,18 +552,53 @@
           .replace(/'/g, "&#039;");
       }
 
-      function parseCsvRow(row) {
-        const cells = [];
-        let currentCell = "";
+      function splitCsvRows(csvText) {
+        const rows = [];
+        let row = "";
         let insideQuotes = false;
 
-        for (let index = 0; index < row.length; index += 1) {
-          const character = row[index];
-          const nextCharacter = row[index + 1];
+        for (let i = 0; i < csvText.length; i += 1) {
+          const character = csvText[i];
+          const next = csvText[i + 1];
 
-          if (character === '"' && insideQuotes && nextCharacter === '"') {
-            currentCell += '"';
-            index += 1;
+          if (character === '"' && insideQuotes && next === '"') {
+            row += '""';
+            i += 1;
+            continue;
+          }
+
+          if (character === '"') {
+            insideQuotes = !insideQuotes;
+            row += character;
+            continue;
+          }
+
+          if ((character === "\n" || character === "\r") && !insideQuotes) {
+            if (character === "\r" && next === "\n") i += 1;
+            if (row.trim()) rows.push(row);
+            row = "";
+            continue;
+          }
+
+          row += character;
+        }
+
+        if (row.trim()) rows.push(row);
+        return rows;
+      }
+
+      function parseCsvRow(row) {
+        const cells = [];
+        let cell = "";
+        let insideQuotes = false;
+
+        for (let i = 0; i < row.length; i += 1) {
+          const character = row[i];
+          const next = row[i + 1];
+
+          if (character === '"' && insideQuotes && next === '"') {
+            cell += '"';
+            i += 1;
             continue;
           }
 
@@ -584,734 +608,427 @@
           }
 
           if (character === "," && !insideQuotes) {
-            cells.push(currentCell);
-            currentCell = "";
+            cells.push(cell);
+            cell = "";
             continue;
           }
 
-          currentCell += character;
+          cell += character;
         }
 
-        cells.push(currentCell);
-
+        cells.push(cell);
         return cells;
       }
 
-      function splitCsvRows(csvText) {
-        const rows = [];
-        let currentRow = "";
-        let insideQuotes = false;
+      function setStatus(type, message) {
+        statusBanner.className = "is-visible is-" + type;
+        statusBanner.textContent = message;
+      }
 
-        for (let index = 0; index < csvText.length; index += 1) {
-          const character = csvText[index];
-          const nextCharacter = csvText[index + 1];
+      function clearStatus() {
+        statusBanner.className = "";
+        statusBanner.textContent = "";
+      }
 
-          if (character === '"' && insideQuotes && nextCharacter === '"') {
-            currentRow += '""';
-            index += 1;
-            continue;
-          }
+      function setSubmitting(isSubmitting) {
+        submissionInProgress = isSubmitting;
 
-          if (character === '"') {
-            insideQuotes = !insideQuotes;
-            currentRow += character;
-            continue;
-          }
+        submitButtons.forEach(button => {
+          button.disabled = isSubmitting;
+          button.textContent = isSubmitting ? "Submitting…" : "Submit Order";
+        });
+      }
 
-          if (
-            (character === "\n" || character === "\r") &&
-            !insideQuotes
-          ) {
-            if (
-              character === "\r" &&
-              nextCharacter === "\n"
-            ) {
-              index += 1;
-            }
-
-            if (currentRow.trim()) {
-              rows.push(currentRow);
-            }
-
-            currentRow = "";
-            continue;
-          }
-
-          currentRow += character;
+      function createSubmissionId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+          return window.crypto.randomUUID();
         }
 
-        if (currentRow.trim()) {
-          rows.push(currentRow);
-        }
+        return Date.now() + "-" + Math.random().toString(36).slice(2);
+      }
 
-        return rows;
+      function cleanProductTitle(fullTitle, vendor) {
+        const escapedVendor = vendor.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        return fullTitle
+          .replace(new RegExp("^" + escapedVendor + "\\s*", "i"), "")
+          .replace(/\(Non-Alcoholic\)/i, "")
+          .trim();
       }
 
       async function loadProducts() {
-        const response = await fetch(sheetUrl, {
-          method: "GET",
-          cache: "no-store"
-        });
+        const response = await fetch(PRODUCT_CSV_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error("The product list could not be loaded.");
 
-        if (!response.ok) {
-          throw new Error(
-            "The wholesale product list could not be loaded."
-          );
-        }
-
-        const csvText = await response.text();
-
-        const rows = splitCsvRows(csvText)
-          .slice(1)
-          .map(parseCsvRow);
-
+        const text = await response.text();
+        const rows = splitCsvRows(text).slice(1).map(parseCsvRow);
         const grouped = {};
 
         rows.forEach(row => {
-          const title = String(row[0] || "").trim();
+          const catalogTitle = String(row[0] || "").trim();
           const canSize = String(row[1] || "").trim();
           const imageUrl = String(row[4] || "").trim();
-          const casePrice = parseFloat(row[5]) || 0;
-          const status = String(row[6] || "")
-            .trim()
-            .toLowerCase();
+          const casePrice = Number.parseFloat(row[5]) || 0;
+          const status = String(row[6] || "").trim().toLowerCase();
 
-          if (!title || status !== "yes") {
-            return;
-          }
+          if (!catalogTitle || status !== "yes") return;
 
-          const vendorMatch = title.match(/^(.+?)\s\(/);
-          const vendor = vendorMatch
-            ? vendorMatch[1].trim()
-            : "Other";
+          const vendorMatch = catalogTitle.match(/^(.+?)\s\(/);
+          const vendor = vendorMatch ? vendorMatch[1].trim() : "Other";
+          const displayTitle = cleanProductTitle(catalogTitle, vendor);
 
-          const cleanTitle = title
-            .replace(
-              new RegExp(
-                "^" +
-                vendor.replace(
-                  /[.*+?^${}()|[\]\\]/g,
-                  "\\$&"
-                ) +
-                "\\s*",
-                "i"
-              ),
-              ""
-            )
-            .replace(/\(Non-Alcoholic\)/i, "")
-            .trim();
-
-          if (!grouped[vendor]) {
-            grouped[vendor] = [];
-          }
+          if (!grouped[vendor]) grouped[vendor] = [];
 
           grouped[vendor].push({
-            title: cleanTitle,
+            catalogTitle,
+            displayTitle,
             canSize,
-            casePrice,
-            imageUrl
+            imageUrl,
+            casePrice
           });
         });
 
         renderProducts(grouped);
+        productsLoaded = true;
       }
 
       function renderProducts(grouped) {
         productList.innerHTML = "";
 
-        const vendorNames = Object.keys(grouped).sort(
-          (first, second) =>
-            first.localeCompare(second)
-        );
+        Object.keys(grouped)
+          .sort((a, b) => a.localeCompare(b))
+          .forEach(vendor => {
+            const group = document.createElement("section");
+            group.className = "vendor-group";
+            group.dataset.searchText = vendor.toLowerCase();
 
-        if (vendorNames.length === 0) {
-          productList.innerHTML =
-            '<div class="buyer-info">No wholesale products are currently available.</div>';
+            const header = document.createElement("button");
+            header.type = "button";
+            header.className = "vendor-header";
+            header.setAttribute("aria-expanded", "false");
+            header.innerHTML = "<span>" + escapeHtml(vendor) + "</span><span aria-hidden=\"true\">▼</span>";
 
-          return;
-        }
+            const products = document.createElement("div");
+            products.className = "vendor-products";
 
-        vendorNames.forEach(vendor => {
-          const vendorHeader =
-            document.createElement("div");
+            header.addEventListener("click", () => {
+              const willOpen = !products.classList.contains("is-open");
+              setGroupOpen(group, willOpen);
+            });
 
-          vendorHeader.className = "vendor-header";
-          vendorHeader.setAttribute("role", "button");
-          vendorHeader.setAttribute("tabindex", "0");
-          vendorHeader.setAttribute("aria-expanded", "false");
-          vendorHeader.textContent = vendor + " ▼";
+            grouped[vendor].forEach(product => {
+              const row = document.createElement("article");
+              row.className = "product-row";
+              row.dataset.catalogTitle = product.catalogTitle;
+              row.dataset.displayTitle = vendor + " – " + product.displayTitle;
+              row.dataset.vendor = vendor;
+              row.dataset.searchText = (vendor + " " + product.displayTitle).toLowerCase();
 
-          const vendorProducts =
-            document.createElement("div");
+              row.innerHTML = `
+                <img src="${escapeHtml(product.imageUrl)}" alt="${escapeHtml(product.displayTitle)}" loading="lazy">
 
-          vendorProducts.className = "vendor-products";
-          vendorProducts.style.display = "none";
-
-          function toggleVendor() {
-            const isOpen =
-              vendorProducts.style.display === "flex";
-
-            vendorProducts.style.display =
-              isOpen ? "none" : "flex";
-
-            vendorHeader.textContent =
-              vendor + (isOpen ? " ▼" : " ▲");
-
-            vendorHeader.setAttribute(
-              "aria-expanded",
-              String(!isOpen)
-            );
-          }
-
-          vendorHeader.addEventListener(
-            "click",
-            toggleVendor
-          );
-
-          vendorHeader.addEventListener(
-            "keydown",
-            event => {
-              if (
-                event.key === "Enter" ||
-                event.key === " "
-              ) {
-                event.preventDefault();
-                toggleVendor();
-              }
-            }
-          );
-
-          grouped[vendor].forEach(product => {
-            const productRow =
-              document.createElement("div");
-
-            productRow.className = "product-row";
-
-            productRow.dataset.itemTitle =
-              vendor + " – " + product.title;
-
-            productRow.dataset.vendor = vendor;
-
-            const safeTitle = escapeHtml(product.title);
-            const safeCanSize = escapeHtml(product.canSize);
-            const safeImageUrl = escapeHtml(product.imageUrl);
-            const safeVendor = escapeHtml(vendor);
-
-            productRow.innerHTML = `
-              <img
-                src="${safeImageUrl}"
-                alt="${safeTitle}"
-                loading="lazy"
-              >
-
-              <div class="product-details">
-                <div class="product-title">
-                  ${safeTitle}
+                <div class="product-details">
+                  <div class="product-title">${escapeHtml(product.displayTitle)}</div>
+                  <div class="can-size">${escapeHtml(product.canSize)}</div>
+                  <div class="wholesale-price">24-Pack Price: ${money(product.casePrice)}</div>
                 </div>
 
-                <div class="can-size">
-                  ${safeCanSize}
+                <div class="qty-inputs">
+                  <label>Cases</label>
+                  <div class="qty-control">
+                    <button type="button" class="decrement" aria-label="Remove one case">−</button>
+                    <input type="number" min="0" max="999" step="1" inputmode="numeric" value="0" data-price="${product.casePrice}" aria-label="Cases of ${escapeHtml(product.displayTitle)}">
+                    <button type="button" class="increment" aria-label="Add one case">+</button>
+                  </div>
                 </div>
+              `;
 
-                <div class="wholesale-price">
-                  24-Pack Price:
-                  $${product.casePrice.toFixed(2)}
-                </div>
-              </div>
+              products.appendChild(row);
+            });
 
-              <div class="qty-inputs">
-                <label>
-                  Cases
-                </label>
-
-                <div class="qty-control">
-                  <button
-                    type="button"
-                    class="qty-btn decrement"
-                    aria-label="Remove one case of ${safeVendor} ${safeTitle}"
-                  >
-                    −
-                  </button>
-
-                  <input
-                    type="number"
-                    min="0"
-                    max="999"
-                    step="1"
-                    inputmode="numeric"
-                    value="0"
-                    data-price="${product.casePrice}"
-                    aria-label="Cases of ${safeVendor} ${safeTitle}"
-                  >
-
-                  <button
-                    type="button"
-                    class="qty-btn increment"
-                    aria-label="Add one case of ${safeVendor} ${safeTitle}"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            `;
-
-            vendorProducts.appendChild(productRow);
+            group.appendChild(header);
+            group.appendChild(products);
+            productList.appendChild(group);
           });
-
-          productList.appendChild(vendorHeader);
-          productList.appendChild(vendorProducts);
-        });
 
         updateTotals();
       }
 
-      function getSelectedItems() {
-        const items = [];
+      function setGroupOpen(group, isOpen) {
+        const header = group.querySelector(".vendor-header");
+        const products = group.querySelector(".vendor-products");
+        const arrow = header.querySelector("span:last-child");
 
-        document
-          .querySelectorAll(".product-row")
-          .forEach(row => {
-            const input = row.querySelector(
-              ".qty-control input"
-            );
-
-            const quantity =
-              parseInt(input.value, 10) || 0;
-
-            if (quantity <= 0) {
-              return;
-            }
-
-            const title = row.dataset.itemTitle;
-            const vendor = row.dataset.vendor || "";
-            const price =
-              parseFloat(input.dataset.price) || 0;
-
-            items.push({
-              row,
-              title,
-              vendor,
-              quantity,
-              price,
-              subtotal: quantity * price
-            });
-          });
-
-        return items;
+        products.classList.toggle("is-open", isOpen);
+        header.setAttribute("aria-expanded", String(isOpen));
+        arrow.textContent = isOpen ? "▲" : "▼";
       }
 
-      function renderSummary() {
-        const items = getSelectedItems();
+      function getSelectedItems() {
+        return Array.from(document.querySelectorAll(".product-row"))
+          .map(row => {
+            const input = row.querySelector(".qty-control input");
+            const quantity = Number.parseInt(input.value, 10) || 0;
+            const price = Number.parseFloat(input.dataset.price) || 0;
 
-        summaryItemsEl.innerHTML = "";
-
-        if (items.length === 0) {
-          summaryItemsEl.innerHTML =
-            '<div class="summary-empty">No items selected yet.</div>';
-        } else {
-          items.forEach(item => {
-            const itemEl =
-              document.createElement("div");
-
-            itemEl.className = "summary-item";
-
-            itemEl.innerHTML = `
-              <div>
-                <div class="summary-item-title">
-                  ${escapeHtml(item.title)}
-                </div>
-
-                <div class="summary-item-meta">
-                  ${escapeHtml(item.vendor)}
-                  •
-                  $${item.price.toFixed(2)}/case
-                </div>
-
-                <button
-                  type="button"
-                  class="summary-remove"
-                >
-                  Remove
-                </button>
-              </div>
-
-              <div style="text-align: right;">
-                <div>
-                  ${item.quantity}×
-                </div>
-
-                <div class="summary-item-price">
-                  $${item.subtotal.toFixed(2)}
-                </div>
-              </div>
-            `;
-
-            itemEl
-              .querySelector(".summary-remove")
-              .addEventListener("click", () => {
-                const input = item.row.querySelector(
-                  ".qty-control input"
-                );
-
-                input.value = 0;
-                updateTotals();
-              });
-
-            summaryItemsEl.appendChild(itemEl);
-          });
-        }
-
-        const totalCases = items.reduce(
-          (total, item) =>
-            total + item.quantity,
-          0
-        );
-
-        const totalAmount = items.reduce(
-          (total, item) =>
-            total + item.subtotal,
-          0
-        );
-
-        totalCasesEl.textContent =
-          String(totalCases);
-
-        grandTotalEl.textContent =
-          "$" + totalAmount.toFixed(2);
-
-        document
-          .querySelectorAll(".order-total-header")
-          .forEach(element => {
-            element.textContent =
-              "Total: $" + totalAmount.toFixed(2);
-          });
+            return {
+              row,
+              catalogTitle: row.dataset.catalogTitle,
+              displayTitle: row.dataset.displayTitle,
+              vendor: row.dataset.vendor,
+              quantity,
+              price,
+              lineTotal: roundMoney(quantity * price)
+            };
+          })
+          .filter(item => item.quantity > 0);
       }
 
       function updateTotals() {
-        renderSummary();
-      }
+        const items = getSelectedItems();
+        summaryItems.innerHTML = "";
 
-      function sanitizeQuantityInput(input) {
-        let value = parseInt(input.value, 10);
+        if (items.length === 0) {
+          summaryItems.innerHTML = '<div class="summary-empty">No items selected yet.</div>';
+        } else {
+          items.forEach(item => {
+            const element = document.createElement("div");
+            element.className = "summary-item";
+            element.innerHTML = `
+              <div>
+                <div class="summary-item-title">${escapeHtml(item.displayTitle)}</div>
+                <div class="summary-item-meta">${item.quantity} × ${money(item.price)} per case</div>
+                <button type="button" class="summary-remove">Remove</button>
+              </div>
+              <div class="summary-item-price">${money(item.lineTotal)}</div>
+            `;
 
-        if (!Number.isFinite(value) || value < 0) {
-          value = 0;
-        }
-
-        if (value > 999) {
-          value = 999;
-        }
-
-        input.value = value;
-      }
-
-      productList.addEventListener(
-        "input",
-        event => {
-          if (
-            event.target.matches(
-              ".qty-control input"
-            )
-          ) {
-            sanitizeQuantityInput(event.target);
-            updateTotals();
-          }
-        }
-      );
-
-      productList.addEventListener(
-        "click",
-        event => {
-          const button = event.target.closest(
-            ".increment, .decrement"
-          );
-
-          if (!button) {
-            return;
-          }
-
-          const input = button
-            .closest(".qty-control")
-            .querySelector("input");
-
-          let value =
-            parseInt(input.value, 10) || 0;
-
-          if (
-            button.classList.contains("increment")
-          ) {
-            value += 1;
-          } else {
-            value -= 1;
-          }
-
-          input.value =
-            Math.min(999, Math.max(0, value));
-
-          updateTotals();
-        }
-      );
-
-      clearAllBtn.addEventListener(
-        "click",
-        () => {
-          document
-            .querySelectorAll(
-              ".qty-control input"
-            )
-            .forEach(input => {
-              input.value = 0;
+            element.querySelector(".summary-remove").addEventListener("click", () => {
+              item.row.querySelector(".qty-control input").value = 0;
+              updateTotals();
             });
 
-          updateTotals();
+            summaryItems.appendChild(element);
+          });
         }
-      );
 
-      function setSubmitting(isSubmitting) {
-        submissionInProgress = isSubmitting;
+        const cases = items.reduce((sum, item) => sum + item.quantity, 0);
+        const subtotal = roundMoney(items.reduce((sum, item) => sum + item.lineTotal, 0));
+        const hst = roundMoney(subtotal * HST_RATE);
+        const total = roundMoney(subtotal + hst);
 
-        loader.style.display =
-          isSubmitting ? "block" : "none";
+        totalCases.textContent = String(cases);
+        subtotalAmount.textContent = money(subtotal);
+        hstAmount.textContent = money(hst);
+        grandTotal.textContent = money(total);
 
-        loaderOverlay.style.display =
-          isSubmitting ? "block" : "none";
+        document.querySelectorAll(".order-total-header").forEach(element => {
+          element.textContent = "Total: " + money(total);
+        });
 
-        submitButtons.forEach(button => {
-          button.disabled = isSubmitting;
+        return { items, cases, subtotal, hst, total };
+      }
 
-          button.textContent =
-            isSubmitting
-              ? "Submitting…"
-              : "Submit Order";
+      function applySearch() {
+        const query = productSearch.value.trim().toLowerCase();
+
+        document.querySelectorAll(".vendor-group").forEach(group => {
+          let matchCount = 0;
+
+          group.querySelectorAll(".product-row").forEach(row => {
+            const matches = !query || row.dataset.searchText.includes(query);
+            row.hidden = !matches;
+            if (matches) matchCount += 1;
+          });
+
+          group.hidden = matchCount === 0;
+
+          if (query && matchCount > 0) {
+            setGroupOpen(group, true);
+          }
         });
       }
 
-      function cleanupSubmission() {
-        if (submissionTimeout) {
-          window.clearTimeout(
-            submissionTimeout
-          );
+      function jsonpStatus(submissionId) {
+        return new Promise((resolve, reject) => {
+          const callbackName = "ddWholesaleStatus_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+          const script = document.createElement("script");
+          let finished = false;
 
-          submissionTimeout = null;
-        }
+          function cleanup() {
+            if (finished) return;
+            finished = true;
+            delete window[callbackName];
+            script.remove();
+          }
 
-        if (temporaryPostForm) {
-          temporaryPostForm.remove();
-          temporaryPostForm = null;
-        }
+          const timeout = window.setTimeout(() => {
+            cleanup();
+            reject(new Error("Status request timed out."));
+          }, 8000);
 
-        setSubmitting(false);
+          window[callbackName] = payload => {
+            window.clearTimeout(timeout);
+            cleanup();
+            resolve(payload);
+          };
+
+          script.onerror = () => {
+            window.clearTimeout(timeout);
+            cleanup();
+            reject(new Error("Status request failed."));
+          };
+
+          script.src =
+            SCRIPT_URL +
+            "?action=status" +
+            "&submissionId=" + encodeURIComponent(submissionId) +
+            "&callback=" + encodeURIComponent(callbackName) +
+            "&_=" + Date.now();
+
+          document.head.appendChild(script);
+        });
       }
 
-      function createSubmissionId() {
-        if (
-          window.crypto &&
-          typeof window.crypto.randomUUID ===
-            "function"
-        ) {
-          return window.crypto.randomUUID();
+      async function waitForSubmission(submissionId) {
+        const startedAt = Date.now();
+
+        while (Date.now() - startedAt < STATUS_TIMEOUT_MS) {
+          try {
+            const result = await jsonpStatus(submissionId);
+
+            if (result && result.status === "success") return result;
+            if (result && result.status === "error") throw new Error(result.message || "The order could not be processed.");
+          } catch (error) {
+            if (error.message && !/Status request/.test(error.message)) throw error;
+          }
+
+          await new Promise(resolve => window.setTimeout(resolve, STATUS_POLL_MS));
         }
 
-        return (
-          Date.now() +
-          "-" +
-          Math.random()
-            .toString(36)
-            .slice(2)
-        );
+        throw new Error("The order service did not confirm the submission. Check the Orders sheet before trying again.");
       }
 
-      window.addEventListener(
-        "message",
-        event => {
-          if (
-            event.source !==
-            submitFrame.contentWindow
-          ) {
-            return;
-          }
+      productList.addEventListener("click", event => {
+        const button = event.target.closest(".increment, .decrement");
+        if (!button) return;
 
-          const result = event.data;
+        const input = button.closest(".qty-control").querySelector("input");
+        const current = Number.parseInt(input.value, 10) || 0;
+        const next = button.classList.contains("increment") ? current + 1 : current - 1;
 
-          if (
-            !result ||
-            result.source !== "dd-wholesale"
-          ) {
-            return;
-          }
+        input.value = Math.min(999, Math.max(0, next));
+        updateTotals();
+      });
 
-          cleanupSubmission();
+      productList.addEventListener("input", event => {
+        if (!event.target.matches(".qty-control input")) return;
 
-          if (result.status === "success") {
-            const reference = result.orderId
-              ? " Reference: " +
-                result.orderId +
-                "."
-              : "";
+        let value = Number.parseInt(event.target.value, 10);
+        if (!Number.isFinite(value) || value < 0) value = 0;
+        event.target.value = Math.min(999, value);
+        updateTotals();
+      });
 
-            window.alert(
-              "✅ Order submitted!" +
-              reference +
-              " A rep will contact you shortly."
-            );
+      productSearch.addEventListener("input", applySearch);
 
-            form.reset();
-            updateTotals();
+      expandAllBtn.addEventListener("click", () => {
+        document.querySelectorAll(".vendor-group:not([hidden])").forEach(group => setGroupOpen(group, true));
+      });
 
-            window.scrollTo({
-              top: 0,
-              behavior: "smooth"
-            });
+      collapseAllBtn.addEventListener("click", () => {
+        document.querySelectorAll(".vendor-group").forEach(group => setGroupOpen(group, false));
+      });
 
-            return;
-          }
+      clearAllBtn.addEventListener("click", () => {
+        document.querySelectorAll(".qty-control input").forEach(input => {
+          input.value = 0;
+        });
+        updateTotals();
+      });
 
-          const message =
-            result.message ||
-            "The order could not be submitted.";
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
 
-          window.alert(
-            "⚠️ " +
-            message +
-            " Please try again or email sales@designateddrinks.ca."
-          );
+        if (submissionInProgress) return;
+        clearStatus();
+
+        if (!form.reportValidity()) return;
+        if (!productsLoaded) {
+          setStatus("error", "The product list is still loading. Please wait a moment and try again.");
+          return;
         }
-      );
 
-      form.addEventListener(
-        "submit",
-        event => {
-          event.preventDefault();
+        const totals = updateTotals();
 
-          if (submissionInProgress) {
-            return;
-          }
+        if (totals.items.length === 0) {
+          setStatus("error", "Select at least one product before submitting the order.");
+          return;
+        }
 
-          if (!form.reportValidity()) {
-            return;
-          }
+        const submissionId = createSubmissionId();
+        const params = new URLSearchParams();
+
+        params.append("submissionId", submissionId);
+        params.append("fullName", form.elements.fullName.value.trim());
+        params.append("companyName", form.elements.companyName.value.trim());
+        params.append("email", form.elements.email.value.trim());
+        params.append("website", "");
+
+        totals.items.forEach((item, index) => {
+          params.append("item_" + index + "_catalogTitle", item.catalogTitle);
+          params.append("item_" + index + "_cases", String(item.quantity));
+        });
+
+        setSubmitting(true);
+        setStatus("working", "Submitting your order and confirming the totals…");
+
+        try {
+          const postPromise = fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            body: params
+          }).catch(() => null);
+
+          const result = await waitForSubmission(submissionId);
+          await postPromise;
+
+          const confirmedTotal = Number(result.total);
+          const totalText = Number.isFinite(confirmedTotal) ? money(confirmedTotal) : money(totals.total);
+          const orderReference = result.orderId ? " Reference: " + result.orderId + "." : "";
+
+          const warnings = Array.isArray(result.warnings) ? result.warnings : [];
+          const confirmationText = warnings.includes("customer-email")
+            ? " The order was saved, but the confirmation email could not be sent."
+            : " A confirmation email has been sent.";
+
+          setStatus("success", "Order submitted successfully for " + totalText + "." + orderReference + confirmationText);
+
+          document.querySelectorAll(".qty-control input").forEach(input => {
+            input.value = 0;
+          });
 
           updateTotals();
-
-          const selectedItems =
-            getSelectedItems();
-
-          if (selectedItems.length === 0) {
-            window.alert(
-              "Please select at least one product before submitting the order."
-            );
-
-            return;
-          }
-
-          const params =
-            new URLSearchParams();
-
-          params.append(
-            "fullName",
-            form.elements.fullName.value.trim()
-          );
-
-          params.append(
-            "companyName",
-            form.elements.companyName.value.trim()
-          );
-
-          params.append(
-            "email",
-            form.elements.email.value.trim()
-          );
-
-          params.append(
-            "submissionId",
-            createSubmissionId()
-          );
-
-          params.append(
-            "website",
-            ""
-          );
-
-          selectedItems.forEach(
-            (item, index) => {
-              params.append(
-                "item_" + index + "_title",
-                item.title
-              );
-
-              params.append(
-                "item_" + index + "_cases",
-                String(item.quantity)
-              );
-            }
-          );
-
-          temporaryPostForm =
-            document.createElement("form");
-
-          temporaryPostForm.method = "POST";
-          temporaryPostForm.action = scriptURL;
-          temporaryPostForm.target =
-            "wholesaleSubmitFrame";
-
-          temporaryPostForm.style.display =
-            "none";
-
-          params.forEach(
-            (value, key) => {
-              const hiddenInput =
-                document.createElement("input");
-
-              hiddenInput.type = "hidden";
-              hiddenInput.name = key;
-              hiddenInput.value = value;
-
-              temporaryPostForm.appendChild(
-                hiddenInput
-              );
-            }
-          );
-
-          document.body.appendChild(
-            temporaryPostForm
-          );
-
-          setSubmitting(true);
-
-          temporaryPostForm.submit();
-
-          submissionTimeout =
-            window.setTimeout(() => {
-              cleanupSubmission();
-
-              window.alert(
-                "⚠️ The order service did not respond. Please try again or email sales@designateddrinks.ca."
-              );
-            }, 30000);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (error) {
+          console.error("Wholesale submission error:", error);
+          setStatus("error", error.message || "The order could not be submitted. Check the Orders sheet before trying again.");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } finally {
+          setSubmitting(false);
         }
-      );
+      });
 
-      try {
-        await loadProducts();
-      } catch (error) {
-        console.error(
-          "Wholesale product loading error:",
-          error
-        );
-
+      loadProducts().catch(error => {
+        console.error("Wholesale product loading error:", error);
         productList.innerHTML = `
-          <div class="buyer-info">
-            <strong>
-              The wholesale product list could not be loaded.
-            </strong>
-
-            <p>
-              Please refresh the page or contact
-              sales@designateddrinks.ca.
-            </p>
+          <div class="loading-products">
+            <strong>The wholesale product list could not be loaded.</strong><br>
+            Refresh the page or email sales@designateddrinks.ca.
           </div>
         `;
-      }
+        setStatus("error", "The wholesale product list could not be loaded.");
+      });
     })();
   </script>
 </body>
